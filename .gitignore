@@ -1,0 +1,6 @@
+# Archivos y carpetas a ignorar por git
+config.php
+.env
+*.env
+.idea/
+.vscode/
