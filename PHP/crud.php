@@ -14,6 +14,12 @@ function conectar() {
 }
 
 // ------------------- CRUD ROLES -------------------
+
+/**
+ * Crea un nuevo rol.
+ * @param string $nombre Nombre del rol
+ * @return bool TRUE si se creó correctamente, FALSE si hubo error
+ */
 function crearRol($nombre) {
 	$conn = conectar();
 	$stmt = $conn->prepare('INSERT INTO roles (nombre) VALUES (?)');
@@ -23,6 +29,10 @@ function crearRol($nombre) {
 	return $res;
 }
 
+/**
+ * Obtiene todos los roles.
+ * @return array Lista de roles
+ */
 function obtenerRoles() {
 	$conn = conectar();
 	$res = $conn->query('SELECT * FROM roles');
@@ -31,6 +41,12 @@ function obtenerRoles() {
 	return $roles;
 }
 
+/**
+ * Actualiza un rol existente.
+ * @param int $id ID del rol
+ * @param string $nombre Nuevo nombre
+ * @return bool TRUE si se actualizó, FALSE si hubo error
+ */
 function actualizarRol($id, $nombre) {
 	$conn = conectar();
 	$stmt = $conn->prepare('UPDATE roles SET nombre=? WHERE id_rol=?');
@@ -40,6 +56,11 @@ function actualizarRol($id, $nombre) {
 	return $res;
 }
 
+/**
+ * Elimina un rol por ID.
+ * @param int $id ID del rol
+ * @return bool TRUE si se eliminó, FALSE si hubo error
+ */
 function eliminarRol($id) {
 	$conn = conectar();
 	$stmt = $conn->prepare('DELETE FROM roles WHERE id_rol=?');
@@ -51,6 +72,14 @@ function eliminarRol($id) {
 
 // ------------------- CRUD USUARIOS -------------------
 
+/**
+ * Crea un nuevo usuario.
+ * @param string $nombre
+ * @param string $correo
+ * @param string $contrasena (sin hashear, se hashea dentro)
+ * @param int $id_rol (opcional, por defecto 2)
+ * @return bool TRUE si se creó, FALSE si hubo error
+ */
 function crearUsuario($nombre, $correo, $contrasena, $id_rol = 2) {
 	$conn = conectar();
 	// Hash seguro de contraseña
@@ -62,6 +91,10 @@ function crearUsuario($nombre, $correo, $contrasena, $id_rol = 2) {
 	return $res;
 }
 
+/**
+ * Obtiene todos los usuarios.
+ * @return array Lista de usuarios
+ */
 function obtenerUsuarios() {
 	$conn = conectar();
 	$res = $conn->query('SELECT * FROM usuarios');
@@ -71,6 +104,15 @@ function obtenerUsuarios() {
 }
 
 
+/**
+ * Actualiza un usuario existente.
+ * @param int $id
+ * @param string $nombre
+ * @param string $correo
+ * @param string $contrasena (sin hashear, se hashea dentro)
+ * @param int $id_rol
+ * @return bool TRUE si se actualizó, FALSE si hubo error
+ */
 function actualizarUsuario($id, $nombre, $correo, $contrasena, $id_rol) {
 	$conn = conectar();
 	// Hash seguro de contraseña
@@ -82,6 +124,11 @@ function actualizarUsuario($id, $nombre, $correo, $contrasena, $id_rol) {
 	return $res;
 }
 
+/**
+ * Elimina un usuario por ID.
+ * @param int $id
+ * @return bool TRUE si se eliminó, FALSE si hubo error
+ */
 function eliminarUsuario($id) {
 	$conn = conectar();
 	$stmt = $conn->prepare('DELETE FROM usuarios WHERE id_usuario=?');
@@ -92,6 +139,12 @@ function eliminarUsuario($id) {
 }
 
 // ------------------- CRUD PREGUNTAS -------------------
+/**
+ * Crea una nueva pregunta.
+ * @param string $texto
+ * @param string $categoria (R, I, A, S, E, C)
+ * @return bool TRUE si se creó, FALSE si hubo error
+ */
 function crearPregunta($texto, $categoria) {
 	$conn = conectar();
 	$stmt = $conn->prepare('INSERT INTO preguntas (texto, categoria) VALUES (?, ?)');
@@ -101,6 +154,10 @@ function crearPregunta($texto, $categoria) {
 	return $res;
 }
 
+/**
+ * Obtiene todas las preguntas.
+ * @return array Lista de preguntas
+ */
 function obtenerPreguntas() {
 	$conn = conectar();
 	$res = $conn->query('SELECT * FROM preguntas');
@@ -109,6 +166,13 @@ function obtenerPreguntas() {
 	return $preguntas;
 }
 
+/**
+ * Actualiza una pregunta existente.
+ * @param int $id
+ * @param string $texto
+ * @param string $categoria
+ * @return bool TRUE si se actualizó, FALSE si hubo error
+ */
 function actualizarPregunta($id, $texto, $categoria) {
 	$conn = conectar();
 	$stmt = $conn->prepare('UPDATE preguntas SET texto=?, categoria=? WHERE id_pregunta=?');
@@ -118,6 +182,11 @@ function actualizarPregunta($id, $texto, $categoria) {
 	return $res;
 }
 
+/**
+ * Elimina una pregunta por ID.
+ * @param int $id
+ * @return bool TRUE si se eliminó, FALSE si hubo error
+ */
 function eliminarPregunta($id) {
 	$conn = conectar();
 	$stmt = $conn->prepare('DELETE FROM preguntas WHERE id_pregunta=?');
@@ -128,6 +197,12 @@ function eliminarPregunta($id) {
 }
 
 // ------------------- CRUD OPCIONES -------------------
+/**
+ * Crea una nueva opción de respuesta.
+ * @param int $valor
+ * @param string $descripcion
+ * @return bool TRUE si se creó, FALSE si hubo error
+ */
 function crearOpcion($valor, $descripcion) {
 	$conn = conectar();
 	$stmt = $conn->prepare('INSERT INTO opciones (valor, descripcion) VALUES (?, ?)');
@@ -137,6 +212,10 @@ function crearOpcion($valor, $descripcion) {
 	return $res;
 }
 
+/**
+ * Obtiene todas las opciones de respuesta.
+ * @return array Lista de opciones
+ */
 function obtenerOpciones() {
 	$conn = conectar();
 	$res = $conn->query('SELECT * FROM opciones');
@@ -145,6 +224,13 @@ function obtenerOpciones() {
 	return $opciones;
 }
 
+/**
+ * Actualiza una opción existente.
+ * @param int $id
+ * @param int $valor
+ * @param string $descripcion
+ * @return bool TRUE si se actualizó, FALSE si hubo error
+ */
 function actualizarOpcion($id, $valor, $descripcion) {
 	$conn = conectar();
 	$stmt = $conn->prepare('UPDATE opciones SET valor=?, descripcion=? WHERE id_opcion=?');
@@ -154,6 +240,11 @@ function actualizarOpcion($id, $valor, $descripcion) {
 	return $res;
 }
 
+/**
+ * Elimina una opción por ID.
+ * @param int $id
+ * @return bool TRUE si se eliminó, FALSE si hubo error
+ */
 function eliminarOpcion($id) {
 	$conn = conectar();
 	$stmt = $conn->prepare('DELETE FROM opciones WHERE id_opcion=?');
@@ -164,6 +255,17 @@ function eliminarOpcion($id) {
 }
 
 // ------------------- CRUD RESULTADOS -------------------
+/**
+ * Crea un resultado de usuario.
+ * @param int $id_usuario
+ * @param int $r
+ * @param int $i
+ * @param int $a
+ * @param int $s
+ * @param int $e
+ * @param int $c
+ * @return bool TRUE si se creó, FALSE si hubo error
+ */
 function crearResultado($id_usuario, $r, $i, $a, $s, $e, $c) {
 	$conn = conectar();
 	$stmt = $conn->prepare('INSERT INTO resultados (id_usuario, puntaje_R, puntaje_I, puntaje_A, puntaje_S, puntaje_E, puntaje_C) VALUES (?, ?, ?, ?, ?, ?, ?)');
@@ -173,6 +275,10 @@ function crearResultado($id_usuario, $r, $i, $a, $s, $e, $c) {
 	return $res;
 }
 
+/**
+ * Obtiene todos los resultados.
+ * @return array Lista de resultados
+ */
 function obtenerResultados() {
 	$conn = conectar();
 	$res = $conn->query('SELECT * FROM resultados');
@@ -181,6 +287,17 @@ function obtenerResultados() {
 	return $resultados;
 }
 
+/**
+ * Actualiza un resultado existente.
+ * @param int $id
+ * @param int $r
+ * @param int $i
+ * @param int $a
+ * @param int $s
+ * @param int $e
+ * @param int $c
+ * @return bool TRUE si se actualizó, FALSE si hubo error
+ */
 function actualizarResultado($id, $r, $i, $a, $s, $e, $c) {
 	$conn = conectar();
 	$stmt = $conn->prepare('UPDATE resultados SET puntaje_R=?, puntaje_I=?, puntaje_A=?, puntaje_S=?, puntaje_E=?, puntaje_C=? WHERE id_resultado=?');
@@ -190,6 +307,11 @@ function actualizarResultado($id, $r, $i, $a, $s, $e, $c) {
 	return $res;
 }
 
+/**
+ * Elimina un resultado por ID.
+ * @param int $id
+ * @return bool TRUE si se eliminó, FALSE si hubo error
+ */
 function eliminarResultado($id) {
 	$conn = conectar();
 	$stmt = $conn->prepare('DELETE FROM resultados WHERE id_resultado=?');
@@ -201,6 +323,12 @@ function eliminarResultado($id) {
 
 
 // ------------------- CRUD BITACORA -------------------
+/**
+ * Crea un registro en la bitácora.
+ * @param int|null $id_usuario
+ * @param string $accion
+ * @return bool TRUE si se creó, FALSE si hubo error
+ */
 function crearBitacora($id_usuario, $accion) {
 	$conn = conectar();
 	if ($id_usuario === null) {
@@ -215,6 +343,10 @@ function crearBitacora($id_usuario, $accion) {
 	return $res;
 }
 
+/**
+ * Obtiene todos los registros de la bitácora.
+ * @return array Lista de registros
+ */
 function obtenerBitacora() {
 	$conn = conectar();
 	$res = $conn->query('SELECT * FROM bitacora');
@@ -223,6 +355,11 @@ function obtenerBitacora() {
 	return $bitacora;
 }
 
+/**
+ * Elimina un registro de la bitácora por ID.
+ * @param int $id
+ * @return bool TRUE si se eliminó, FALSE si hubo error
+ */
 function eliminarBitacora($id) {
 	$conn = conectar();
 	$stmt = $conn->prepare('DELETE FROM bitacora WHERE id_bitacora=?');
