@@ -1,38 +1,42 @@
--- Roles
+-- Tabla: roles
 CREATE TABLE roles (
-    id_rol INT AUTO_INCREMENT PRIMARY KEY,
+    id_rol INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(50) NOT NULL UNIQUE
 );
 
--- Usuarios
+
+-- Tabla: usuarios
 CREATE TABLE usuarios (
-    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100) NOT NULL,
-    correo VARCHAR(150) UNIQUE NOT NULL,
+    correo VARCHAR(150) NOT NULL UNIQUE,
     contrasena VARCHAR(255) NOT NULL,
     id_rol INT NOT NULL DEFAULT 2,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
 );
 
--- Preguntas (categoría directamente como ENUM fijo)
+
+-- Tabla: preguntas
 CREATE TABLE preguntas (
-    id_pregunta INT AUTO_INCREMENT PRIMARY KEY,
+    id_pregunta INT PRIMARY KEY AUTO_INCREMENT,
     texto TEXT NOT NULL,
     categoria ENUM('R','I','A','S','E','C') NOT NULL
 );
 
--- Opciones (escala global 0-5)
+
+-- Tabla: opciones
 CREATE TABLE opciones (
-    id_opcion INT AUTO_INCREMENT PRIMARY KEY,
+    id_opcion INT PRIMARY KEY AUTO_INCREMENT,
     valor TINYINT NOT NULL CHECK (valor BETWEEN 0 AND 5),
     descripcion VARCHAR(100)
 );
 
--- Resultados (una fila por usuario, columnas fijas RIASEC)
+
+-- Tabla: resultados
 CREATE TABLE resultados (
-    id_resultado INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT NOT NULL,
+    id_resultado INT PRIMARY KEY AUTO_INCREMENT,
+    id_usuario INT,
     puntaje_R INT NOT NULL DEFAULT 0,
     puntaje_I INT NOT NULL DEFAULT 0,
     puntaje_A INT NOT NULL DEFAULT 0,
@@ -40,18 +44,19 @@ CREATE TABLE resultados (
     puntaje_E INT NOT NULL DEFAULT 0,
     puntaje_C INT NOT NULL DEFAULT 0,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
-    UNIQUE KEY uq_usuario_resultado (id_usuario)
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 
--- Bitácora
+
+-- Tabla: bitacora
 CREATE TABLE bitacora (
-    id_bitacora INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT NULL,
+    id_bitacora INT PRIMARY KEY AUTO_INCREMENT,
+    id_usuario INT,
     accion VARCHAR(255) NOT NULL,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
+
 
 -- Datos iniciales
 INSERT INTO roles (nombre) VALUES ('Administrador'), ('Usuario');
