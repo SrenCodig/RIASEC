@@ -321,52 +321,126 @@ function eliminarResultado($id) {
 	return $res;
 }
 
-
-// ------------------- CRUD BITACORA -------------------
+// ------------------- CRUD CARRERAS -------------------
 /**
- * Crea un registro en la bitácora.
- * @param int|null $id_usuario
- * @param string $accion
+ * Crea una nueva carrera.
+ * @param string $nombre
+ * @param int|null $r
+ * @param int|null $i
+ * @param int|null $a
+ * @param int|null $s
+ * @param int|null $e
+ * @param int|null $c
+ * @param string $descripcion
  * @return bool TRUE si se creó, FALSE si hubo error
  */
-function crearBitacora($id_usuario, $accion) {
+function crearCarrera($nombre, $r, $i, $a, $s, $e, $c, $descripcion) {
 	$conn = conectar();
-	if ($id_usuario === null) {
-		$stmt = $conn->prepare('INSERT INTO bitacora (id_usuario, accion) VALUES (NULL, ?)');
-		$stmt->bind_param('s', $accion);
-	} else {
-		$stmt = $conn->prepare('INSERT INTO bitacora (id_usuario, accion) VALUES (?, ?)');
-		$stmt->bind_param('is', $id_usuario, $accion);
-	}
+	$stmt = $conn->prepare('INSERT INTO carreras (nombre, puntaje_R, puntaje_I, puntaje_A, puntaje_S, puntaje_E, puntaje_C, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+	$stmt->bind_param('siiiiiis', $nombre, $r, $i, $a, $s, $e, $c, $descripcion);
 	$res = $stmt->execute();
 	$stmt->close(); $conn->close();
 	return $res;
 }
 
 /**
- * Obtiene todos los registros de la bitácora.
- * @return array Lista de registros
+ * Obtiene todas las carreras.
+ * @return array Lista de carreras
  */
-function obtenerBitacora() {
+function obtenerCarreras() {
 	$conn = conectar();
-	$res = $conn->query('SELECT * FROM bitacora');
-	$bitacora = $res->fetch_all(MYSQLI_ASSOC);
+	$res = $conn->query('SELECT * FROM carreras');
+	$carreras = $res->fetch_all(MYSQLI_ASSOC);
 	$res->close(); $conn->close();
-	return $bitacora;
+	return $carreras;
 }
 
 /**
- * Elimina un registro de la bitácora por ID.
+ * Actualiza una carrera existente.
+ * @param int $id
+ * @param string $nombre
+ * @param int|null $r
+ * @param int|null $i
+ * @param int|null $a
+ * @param int|null $s
+ * @param int|null $e
+ * @param int|null $c
+ * @param string $descripcion
+ * @return bool TRUE si se actualizó, FALSE si hubo error
+ */
+function actualizarCarrera($id, $nombre, $r, $i, $a, $s, $e, $c, $descripcion) {
+	$conn = conectar();
+	$stmt = $conn->prepare('UPDATE carreras SET nombre=?, puntaje_R=?, puntaje_I=?, puntaje_A=?, puntaje_S=?, puntaje_E=?, puntaje_C=?, descripcion=? WHERE id_carrera=?');
+	$stmt->bind_param('siiiiisii', $nombre, $r, $i, $a, $s, $e, $c, $descripcion, $id);
+	$res = $stmt->execute();
+	$stmt->close(); $conn->close();
+	return $res;
+}
+
+/**
+ * Elimina una carrera por ID.
  * @param int $id
  * @return bool TRUE si se eliminó, FALSE si hubo error
  */
-function eliminarBitacora($id) {
+function eliminarCarrera($id) {
 	$conn = conectar();
-	$stmt = $conn->prepare('DELETE FROM bitacora WHERE id_bitacora=?');
+	$stmt = $conn->prepare('DELETE FROM carreras WHERE id_carrera=?');
 	$stmt->bind_param('i', $id);
 	$res = $stmt->execute();
 	$stmt->close(); $conn->close();
 	return $res;
+}
+
+
+function obtenerCarrerasRecomendadas($puntajesUsuario) {
+    $carreras = obtenerCarreras(); // Debes crear esta función en crud.php
+    $recomendadas = [];
+    foreach ($carreras as $carrera) {
+        // Calcula la diferencia total entre el perfil y el usuario
+        $diferencia = abs($puntajesUsuario['R'] - $carrera['puntaje_R'])
+                    + abs($puntajesUsuario['I'] - $carrera['puntaje_I'])
+                    + abs($puntajesUsuario['A'] - $carrera['puntaje_A'])
+                    + abs($puntajesUsuario['S'] - $carrera['puntaje_S'])
+                    + abs($puntajesUsuario['E'] - $carrera['puntaje_E'])
+                    + abs($puntajesUsuario['C'] - $carrera['puntaje_C']);
+        $recomendadas[] = ['nombre' => $carrera['nombre'], 'diferencia' => $diferencia];
+    }
+    // Ordena por menor diferencia
+    usort($recomendadas, fn($a, $b) => $a['diferencia'] <=> $b['diferencia']);
+    // Devuelve las 3 mejores
+    return array_slice($recomendadas, 0, 3);
+}
+
+/**
+ * Genera el contenido de un archivo de detalles de carreras recomendadas para el usuario.
+ * Ordena todas las carreras por afinidad y muestra la mejor recomendación.
+ * @param array $puntajesUsuario Puntajes del usuario (R, I, A, S, E, C)
+ * @return string Contenido listo para descargar en .txt
+ */
+function generarDetallesCarreras($puntajesUsuario) {
+	$carreras = obtenerCarreras();
+	$detalles = "CARRERAS RECOMENDADAS\n\n";
+	$recomendadas = [];
+	foreach ($carreras as $carrera) {
+		$diferencia = abs($puntajesUsuario['R'] - $carrera['puntaje_R'])
+					+ abs($puntajesUsuario['I'] - $carrera['puntaje_I'])
+					+ abs($puntajesUsuario['A'] - $carrera['puntaje_A'])
+					+ abs($puntajesUsuario['S'] - $carrera['puntaje_S'])
+					+ abs($puntajesUsuario['E'] - $carrera['puntaje_E'])
+					+ abs($puntajesUsuario['C'] - $carrera['puntaje_C']);
+		$recomendadas[] = [
+			'nombre' => $carrera['nombre'],
+			'descripcion' => $carrera['descripcion'],
+			'diferencia' => $diferencia
+		];
+	}
+	usort($recomendadas, fn($a, $b) => $a['diferencia'] <=> $b['diferencia']);
+	$detalles .= "La carrera más recomendada para ti es: " . $recomendadas[0]['nombre'] . "\n\n";
+	$detalles .= "Lista completa ordenada por afinidad:\n";
+	foreach ($recomendadas as $i => $c) {
+		$detalles .= ($i+1) . ". " . $c['nombre'] . "\n   Descripción: " . $c['descripcion'] . "\n   Diferencia de perfil: " . $c['diferencia'] . "\n\n";
+	}
+	return $detalles;
 }
 
 ?>

@@ -142,6 +142,19 @@ body.active .explicacion-dominante{color:#fff;font-weight:bold} /* Explicación 
 .perfil-narrativo{font-size:1.13em;line-height:1.6;background:#fff;border-radius:10px;padding:1em;margin-top:.7em;box-shadow:0 1px 6px rgba(21,101,192,.07)} /* Perfil narrativo */
 body.active .perfil-narrativo{background:#16203a;color:#eaf6ff} /* Perfil narrativo oscuro */
 
+/* === SECCIÓN: PERFIL NARRATIVO DESTACADO === */
+
+/* === SECCIÓN: PERFIL NARRATIVO SIMPLE === */
+.perfil-narrativo-simple{background:#e3eafc;border-radius:16px;padding:1.3em 1.2em;margin:1em 0;box-shadow:0 2px 12px rgba(21,101,192,.10);transition:.3s;} /* Contenedor perfil narrativo */
+body.active .perfil-narrativo-simple{background:#16203a;border-radius:16px;color:#eaf6ff;box-shadow:0 2px 12px #223a5f88;} /* Contenedor perfil narrativo oscuro */
+.perfil-narrativo-texto{font-size:1.13em;line-height:1.6;color:#0a2342;font-weight:600;letter-spacing:.3px;margin-bottom:.7em;transition:.3s;border-radius:12px;padding:.7em 1em;} /* Texto perfil narrativo */
+body.active .perfil-narrativo-texto{color:#eaf6ff;background:#223a5f;} /* Texto perfil narrativo oscuro */
+.perfil-narrativo-texto:hover{background:#e3eafc;color:#1565c0;box-shadow:0 2px 8px #90caf9;transform:scale(1.02);} /* Hover texto perfil narrativo */
+body.active .perfil-narrativo-texto:hover{background:#0a2342;color:#ffffff;box-shadow:0 2px 8px #1565c0;transform:scale(1.02);} /* Hover texto perfil narrativo oscuro */
+.perfil-narrativo-carreras{margin-top:.7em;transition: background .4s, color .4s, box-shadow .4s, transform .3s;} /* Contenedor carreras */
+.perfil-narrativo-carreras:hover {background: #e3eafc;color: #1565c0;box-shadow: 0 2px 8px #90caf9;transform: scale(1.02);border-radius: 14px;transition: background .4s, color .4s, box-shadow .4s, transform .3s; } /* Hover carreras */
+body.active .perfil-narrativo-carreras:hover {background: #0a2342;color: #ffffff;box-shadow: 0 2px 8px #1565c0;transform: scale(1.02);border-radius: 14px;transition: background .4s, color .4s, box-shadow .4s, transform .3s;} /* Hover carreras oscuro */
+
 /* === SECCIÓN: MENSAJES E ICONOGRAFÍA === */
 .info{font-size:1.15em;color:#0a2342;background:#e3eafc;border-radius:8px;padding:.7em 1em;margin:1em 0;text-align:center} /* Info */
 body.active .info{color:#90caf9;background:#223a5f} /* Info oscuro */
@@ -161,3 +174,30 @@ body.active .btn-cat.active {background:#1565c0!important;color:#fff!important;}
 .acciones-pregunta .btn-accion {display:inline-block;margin:0 .1em;min-width:60px;max-width:100px;font-size:.95em;font-weight:600;overflow:hidden;} /* Botones acción */
 .categoria-seleccionada {font-weight:900;font-size:1.35em;color:#1565c0;background:transparent;padding:.2em .7em;border-radius:12px;transition:.5s;display:inline-block;}   /* Categoría seleccionada */
 .paginacion-categorias {display:flex;gap:1em;justify-content:center;margin:2em 0;flex-wrap:wrap;} /* Paginación categorías */
+
+/* === SECCIÓN: CARRERAS RECOMENDADAS (NOMBRES) === */
+.carreras-recomendadas-section{margin:1.5em 0 0 0;padding:1.2em;background:#e3eafc;border-radius:14px;box-shadow:0 2px 12px rgba(21,101,192,.08);} /* Encapsulamiento sección nombres carreras */
+.carreras-recomendadas-titulo{font-size:1.25em;font-weight:700;color:#1565c0;margin-bottom:.7em;text-align:left;letter-spacing:.5px;} /* Título carreras recomendadas */
+.carreras-nombres-lista{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5em;} /* Lista nombres carreras */
+.carrera-nombre-item{background:#fff;border-radius:12px;padding:.7em 1.2em;font-size:1.13em;font-weight:700;color:#1565c0;box-shadow:0 2px 8px rgba(21,101,192,.08);transition:box-shadow .4s,background .4s,color .4s,transform .3s;position:relative;animation:fadeIn .7s cubic-bezier(.4,0,.2,1);} /* Item nombre carrera con animación */
+.carrera-nombre-item:hover{background:#e3eafc;color:#000000;box-shadow:0 4px 16px rgba(21,101,192,.18);transform:scale(1.03);} /* Hover nombre carrera con animación */
+.carrera-nombre-texto{font-size:1.13em;letter-spacing:.5px;} /* Texto nombre carrera */
+body.active .carreras-recomendadas-section{background:#223a5f;} /* Encapsulamiento oscuro nombres carreras */
+body.active .carreras-recomendadas-titulo{color:#eaf6ff;} /* Título oscuro carreras recomendadas */
+body.active .carrera-nombre-item{background:#223a5f;color:#ffffff;} /* Item oscuro nombre carrera */
+body.active .carrera-nombre-item:hover{background:#16203a;color:#fff;box-shadow:0 4px 16px rgba(144,202,249,.18);transform:scale(1.03);} /* Hover oscuro nombre carrera con animación */
+
+/* === SECCIÓN: CARRERAS RECOMENDADAS (DESCRIPCIÓN) === */
+.carreras-descripcion-section{margin:1.5em 0 0 0;padding:1.2em;background:#e3eafc;border-radius:14px;box-shadow:0 2px 12px rgba(21,101,192,.08);} /* Encapsulamiento sección descripciones carreras */
+.carreras-descripcion-titulo{font-size:1.25em;font-weight:700;color:#1565c0;margin-bottom:.7em;text-align:left;letter-spacing:.5px;} /* Título descripciones carreras */
+.carreras-descripcion-lista{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.7em;} /* Lista descripciones carreras */
+.carrera-descripcion-item{background:#fff;border-radius:12px;padding:.7em 1.2em;font-size:1.13em;color:#0a2342;box-shadow:0 2px 8px rgba(21,101,192,.08);transition:box-shadow .4s,background .4s,color .4s,transform .3s;position:relative;animation:fadeIn .7s cubic-bezier(.4,0,.2,1);} /* Item descripción carrera con animación */
+.carrera-descripcion-item:hover{background:#90caf9;color:#1565c0;box-shadow:0 4px 16px rgba(21,101,192,.18);transform:scale(1.03);} /* Hover descripción carrera con animación */
+.carrera-descripcion-nombre{font-weight:800;color:#1565c0;} /* Nombre destacado descripción */
+.carrera-descripcion-texto{font-size:1.08em;color:#0a2342;} /* Texto descripción carrera */
+body.active .carreras-descripcion-section{background:#223a5f;} /* Encapsulamiento oscuro descripciones carreras */
+body.active .carreras-descripcion-titulo{color:#eaf6ff;} /* Título oscuro descripciones carreras */
+body.active .carrera-descripcion-item{background:#223a5f;color:#90caf9;} /* Item oscuro descripción carrera */
+body.active .carrera-descripcion-item:hover{background:#16203a;color:#fff;box-shadow:0 4px 16px rgba(144,202,249,.18);transform:scale(1.03);} /* Hover oscuro descripción carrera con animación */
+body.active .carrera-descripcion-nombre{color:#90caf9;} /* Nombre destacado oscuro descripción */
+body.active .carrera-descripcion-texto{color:#eaf6ff;} /* Texto oscuro descripción carrera */

@@ -47,6 +47,19 @@ CREATE TABLE resultados (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 
+-- Tabla: carreras
+CREATE TABLE carreras (
+    id_carrera INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    puntaje_R INT,
+    puntaje_I INT,
+    puntaje_A INT,
+    puntaje_S INT,
+    puntaje_E INT,
+    puntaje_C INT,
+    descripcion TEXT
+);
+
 -- Datos iniciales
 INSERT INTO roles (nombre) VALUES ('Administrador'), ('Usuario');
 

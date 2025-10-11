@@ -1,5 +1,6 @@
 <!-- PARTE PHP -->
 
+
 <?php
 require_once __DIR__ . '/../../PHP/crud.php';
 session_start();
@@ -58,8 +59,29 @@ if (isset($_GET['id_resultado']) && $usuarioRegistrado) {
         }
     }
 }
-?>
 
+// Procesar descarga de detalles antes de enviar HTML
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['descargar_detalles'])) {
+    // Determinar puntajes actuales
+    $resultadoParaMostrar = $mostrarDetalle && $detalleResultado ? $detalleResultado : $resultadoActual;
+    if ($resultadoParaMostrar) {
+        $puntajes = [
+            'R' => $resultadoParaMostrar['puntaje_R'],
+            'I' => $resultadoParaMostrar['puntaje_I'],
+            'A' => $resultadoParaMostrar['puntaje_A'],
+            'S' => $resultadoParaMostrar['puntaje_S'],
+            'E' => $resultadoParaMostrar['puntaje_E'],
+            'C' => $resultadoParaMostrar['puntaje_C']
+        ];
+        $detalles = generarDetallesCarreras($puntajes);
+        header('Content-Type: text/plain');
+        header('Content-Disposition: attachment; filename="detalles.txt"');
+        echo $detalles;
+        exit;
+    }
+}
+
+?>
 <!-- PARTE HTML -->
 
 <!DOCTYPE html>
@@ -160,6 +182,25 @@ if (isset($_GET['id_resultado']) && $usuarioRegistrado) {
                 $perfil .= "<li><strong>$letra</strong>: " . $explicaciones[$letra] . "</li>";
             }
             $perfil .= "</ul>Personas con este perfil suelen destacar en áreas donde se combinan estas características. Te recomendamos explorar carreras y ocupaciones que integren estos intereses para potenciar tu desarrollo profesional y personal.";
+
+                // Obtener las 3 mejores carreras recomendadas
+                $carrerasRecomendadas = obtenerCarrerasRecomendadas([
+                    'R' => $puntajes['R'],
+                    'I' => $puntajes['I'],
+                    'A' => $puntajes['A'],
+                    'S' => $puntajes['S'],
+                    'E' => $puntajes['E'],
+                    'C' => $puntajes['C']
+                ]);
+                // Obtener descripciones completas de las carreras
+                $carrerasFull = [];
+                foreach (obtenerCarreras() as $carrera) {
+                    foreach ($carrerasRecomendadas as $rec) {
+                        if ($carrera['nombre'] === $rec['nombre']) {
+                            $carrerasFull[] = $carrera;
+                        }
+                    }
+                }
         ?>
         <section class="resultado-section">
             <article class="puntajes-article">
@@ -186,12 +227,37 @@ if (isset($_GET['id_resultado']) && $usuarioRegistrado) {
                         </li>
                     <?php endforeach; ?>
                 </ul>
+                    <h3 class="subtitulo">Tus 3 mejores carreras recomendadas:</h3>
+                    <ul class="carreras-nombres-lista">
+                        <?php foreach ($carrerasRecomendadas as $carrera): ?>
+                            <li class="carrera-nombre-item"><span class="carrera-nombre-texto"><?= htmlspecialchars($carrera['nombre']) ?></span></li>
+                        <?php endforeach; ?>
+                        <!-- Botón para descargar detalles de carreras recomendadas -->
+                        <li style="list-style:none;margin-top:1em;text-align:center;">
+                            <form method="post" action="" style="display:inline;">
+                                <input type="hidden" name="descargar_detalles" value="1">
+                                <button type="submit" class="btn-pag">Ver detalles</button>
+                            </form>
+                        </li>
+                    </ul>
             </article>
             <article class="perfil-article">
-                <h3 class="subtitulo">Perfil narrativo:</h3>
-                <div class="perfil-narrativo">
-                    <?= $perfil ?>
-                </div>
+                    <h3 class="subtitulo">Perfil narrativo:</h3>
+                    <div class="perfil-narrativo perfil-narrativo-simple">
+                        <div class="perfil-narrativo-texto">
+                            <?= $perfil ?>
+                        </div>
+                        <section class="carreras-descripcion-section perfil-narrativo-carreras">
+                            <h4 class="carreras-descripcion-titulo">Tus 3 carreras recomendadas y sus descripciones:</h4>
+                            <ul class="carreras-descripcion-lista">
+                                <?php foreach ($carrerasFull as $carrera): ?>
+                                    <li class="carrera-descripcion-item">
+                                        <strong class="carrera-descripcion-nombre"><?= htmlspecialchars($carrera['nombre']) ?>:</strong> <span class="carrera-descripcion-texto"><?= htmlspecialchars($carrera['descripcion']) ?></span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </section>
+                    </div>
             </article>
         </section>
         <?php else: ?>
