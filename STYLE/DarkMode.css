@@ -1,0 +1,19 @@
+/* === CARRUSEL EN MODO OSCURO === */
+body.active .carrusel-tarjeta {background: #223a5f;color: #eaf6ff;} /* Tarjeta base */
+body.active .carrusel-badge.badge-ultima { background: #43a047; } /* Ultima realizada */
+body.active .carrusel-badge.badge-primera { background: #1976d2; } /* Primera Realizada */
+
+/* === SWITCH MODO OSCURO === */
+.dark-mode-switch{width:120px;height:48px;display:flex;align-items:center;border-radius:999px;background:#dfdede;cursor:pointer;transition:.5s;position:fixed;top:1em;left:1em;z-index:201;box-shadow:0 2px 8px rgba(10,35,66,.1);margin:0;padding:0} /* Contenedor del interruptor */
+body.active .dark-mode-switch{background:#10182a} /* Fondo oscuro */
+
+/* === CÍRCULO DESLIZANTE === */
+.dark-mode-switch .circle{width:48px;height:48px;border-radius:50%;display:flex;justify-content:center;align-items:center;position:relative;background:#fff;transform:translateX(0);transition:.5s;overflow:hidden} /* Círculo base */
+body.active .dark-mode-switch .circle{transform:translateX(72px);background:#223a5f} /* Movimiento a la derecha */
+
+/* === ICONOS DE SOL Y LUNA === */
+.dark-mode-switch .sun,.dark-mode-switch .moon{position:absolute;width:32px;height:32px;transition:.5s} /* Ambos íconos */
+.dark-mode-switch .sun{left:8px;top:8px;color:#fcde5b;transform:translateY(0)} /* Sol visible por defecto */
+body.active .dark-mode-switch .sun{transform:translateY(60px)} /* Sol baja al activar oscuro */
+.dark-mode-switch .moon{left:8px;top:8px;color:#fff;transform:translateY(-60px)} /* Luna oculta inicialmente */
+body.active .dark-mode-switch .moon{transform:translateY(0)} /* Luna visible en modo oscuro */

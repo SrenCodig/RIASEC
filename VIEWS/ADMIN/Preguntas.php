@@ -1,170 +1,69 @@
-<!--
- * Vista de administración para la gestión de preguntas y opciones de respuesta del test RIASEC.
- 
- * Funcionalidades principales:
- * - Seguridad: Solo accesible para usuarios con rol de administrador.
-
-* - Gestión de preguntas:
- *   - Listado de preguntas agrupadas por categoría RIASEC (R, I, A, S, E, C).
- *   - Formulario para agregar o editar preguntas (texto y categoría).
- *   - Eliminación de preguntas.
-
- * - Gestión de opciones de respuesta:
- *   - Listado de opciones con valor numérico y descripción.
- *   - Formulario para agregar o editar opciones (valor entre 0 y 100, descripción).
- *   - Validaciones para el valor y la descripción de la opción.
- *   - Eliminación de opciones.
-
- * - Mensajes de estado para informar sobre el éxito o error de las acciones realizadas.
- * - Navegación: Enlace para volver al menú de opciones administrativas.
- *
- * Dependencias:
- * - Requiere el archivo '../../PHP/crud.php' para las funciones CRUD de preguntas y opciones.
- * - Utiliza sesiones para controlar el acceso.
- *
- * Seguridad:
- * - Verifica que el usuario esté autenticado y tenga rol de administrador antes de mostrar la vista.
- * - Sanitiza las entradas y salidas para evitar vulnerabilidades XSS.
- *
- * Estructura:
- * - Bloque de opciones de respuesta (gestión y listado).
- * - Bloque de preguntas del test (gestión y listado por categoría).
- * - Mensajes de estado y navegación.
--->
-
-
-<!-- PARTE PHP -->
-
 <?php
-// Medida de seguridad, Vista de gestión de preguntas (solo admin)
+// Preguntas.php - Gestión avanzada de preguntas RIASEC
 require_once '../../PHP/crud.php';
 session_start();
+
+// Seguridad: solo administradores
 if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
-    die('<h2>Acceso denegado. Solo administradores.</h2>');
+    header('Location: /RIASEC/index.php');
+    exit;
 }
 
-// Opciones de administración de preguntas
+// --- Variables de estado ---
 $msg = '';
-// Agregar o editar pregunta
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $texto = trim($_POST['texto'] ?? '');
-    $categoria = $_POST['categoria'] ?? '';
-    $id_edit = $_POST['id_edit'] ?? '';
-    if ($texto && $categoria) {
-        try {
-            if ($id_edit) {
-                if (actualizarPregunta($id_edit, $texto, $categoria)) {
-                    $msg = 'Pregunta actualizada correctamente.';
-                } else {
-                    $msg = 'Error al actualizar la pregunta.';
-                }
-            } else {
-                if (crearPregunta($texto, $categoria)) {
-                    $msg = 'Pregunta agregada correctamente.';
-                } else {
-                    $msg = 'Error al agregar la pregunta.';
-                }
-            }
-        } catch (Exception $e) {
-            $msg = 'Error: ' . htmlspecialchars($e->getMessage());
-        }
-    } else {
-        $msg = 'Faltan datos.';
-    }
-}
-// Eliminar pregunta
+$categorias = ['R' => 'Realista', 'I' => 'Investigador', 'A' => 'Artístico', 'S' => 'Social', 'E' => 'Emprendedor', 'C' => 'Convencional'];
+$catActual = isset($_GET['categoria']) && isset($categorias[$_GET['categoria']]) ? $_GET['categoria'] : 'R';
+$todasPreguntas = array_filter(obtenerPreguntas(), fn($p) => $p['categoria'] === $catActual);
+$totalPreguntas = count($todasPreguntas);
+$preguntasPorPagina = 10;
+$paginaActual = isset($_GET['pag']) ? max(1, (int)$_GET['pag']) : 1;
+$inicio = ($paginaActual - 1) * $preguntasPorPagina;
+$preguntas = array_slice($todasPreguntas, $inicio, $preguntasPorPagina);
+
+// --- Acciones: eliminar, editar, agregar ---
 if (isset($_GET['eliminar'])) {
-    $id_eliminar = $_GET['eliminar'];
-    if (eliminarPregunta($id_eliminar)) {
-        $msg = 'Pregunta eliminada correctamente.';
-    } else {
-        $msg = 'Error al eliminar la pregunta.';
-    }
+    $id = (int)$_GET['eliminar'];
+    eliminarPregunta($id);
+    $msg = 'Pregunta eliminada correctamente.';
+    header('Location: Preguntas.php?categoria=' . $catActual . '&msg=' . urlencode($msg));
+    exit;
 }
-
-$preguntas = obtenerPreguntas();
-// Agrupar por categoría
-$porCategoria = ['R'=>[], 'I'=>[], 'A'=>[], 'S'=>[], 'E'=>[], 'C'=>[]];
-foreach ($preguntas as $p) {
-    $porCategoria[$p['categoria']][] = $p;
-}
-// Gestión de opciones de respuesta
-$opciones = obtenerOpciones();
-$maxValor = 0;
-foreach ($opciones as $o) {
-    if ($o['valor'] > $maxValor) $maxValor = $o['valor'];
-}
-
-// Variables para edición de opción
-$editandoOpcion = false;
-$opcionEdit = null;
-
-// Agregar/editar/eliminar opción
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Agregar o editar opción
-    if (isset($_POST['accion_opcion'])) {
-        $id_opcion_edit = $_POST['id_opcion_edit'] ?? '';
-        // Validaciones para el valor
-        $errorOpcion = '';
-        if ($descripcion === '') {
-            $errorOpcion = 'La descripción no puede estar vacía.';
-        } elseif (!is_numeric($_POST['valor'])) {
-            $errorOpcion = 'El valor debe ser un número.';
-        } elseif ($valor < 0) {
-            $errorOpcion = 'El valor no puede ser negativo.';
-        } elseif ($valor > 100) {
-            $errorOpcion = 'El valor máximo permitido es 100.';
-        } elseif (strlen((string)$valor) > 3) {
-            $errorOpcion = 'El valor debe tener máximo 3 dígitos.';
-        }
-        if ($errorOpcion) {
-            $msg = $errorOpcion;
+    // Agregar pregunta
+    if (isset($_POST['agregar_pregunta'])) {
+        $texto = trim($_POST['texto_nueva'] ?? '');
+        $categoria = $_POST['categoria_nueva'] ?? '';
+        if ($texto && isset($categorias[$categoria])) {
+            crearPregunta($texto, $categoria);
+            $msg = 'Pregunta agregada correctamente.';
+            header('Location: Preguntas.php?categoria=' . $categoria . '&msg=' . urlencode($msg));
+            exit;
         } else {
-            if ($id_opcion_edit) {
-                if (actualizarOpcion($id_opcion_edit, $valor, $descripcion)) {
-                    $msg = 'Opción actualizada correctamente.';
-                } else {
-                    $msg = 'Error al actualizar la opción.';
-                }
-            } else {
-                if (crearOpcion($valor, $descripcion)) {
-                    $msg = 'Opción agregada correctamente.';
-                } else {
-                    $msg = 'Error al agregar la opción.';
-                }
-            }
+            $msg = 'Error: Debe ingresar texto y categoría válida.';
+        }
+    }
+    // Editar pregunta
+    if (isset($_POST['editar_pregunta'])) {
+        $id = (int)($_POST['id_editar'] ?? 0);
+        $texto = trim($_POST['texto_editar'] ?? '');
+        $categoria = $_POST['categoria_editar'] ?? '';
+        if ($id && $texto && isset($categorias[$categoria])) {
+            actualizarPregunta($id, $texto, $categoria);
+            $msg = 'Pregunta editada correctamente.';
+            header('Location: Preguntas.php?categoria=' . $categoria . '&msg=' . urlencode($msg));
+            exit;
+        } else {
+            $msg = 'Error: Debe ingresar texto y categoría válida.';
         }
     }
 }
-// Eliminar opción
-if (isset($_GET['eliminar_opcion'])) {
-    $id_eliminar_opcion = $_GET['eliminar_opcion'];
-    if (eliminarOpcion($id_eliminar_opcion)) {
-        $msg = 'Opción eliminada correctamente.';
-    } else {
-        $msg = 'Error al eliminar la opción.';
-    }
-}
-// Si se va a editar opción
-if (isset($_GET['editar_opcion'])) {
-    $id_edit_opcion = $_GET['editar_opcion'];
-    foreach ($opciones as $o) {
-        if ($o['id_opcion'] == $id_edit_opcion) {
-            $editandoOpcion = true;
-            $opcionEdit = $o;
-            break;
-        }
-    }
-}
-// Recargar opciones después de cambios
-$opciones = obtenerOpciones();
-// Si se va a editar
+// --- Edición individual ---
 $editando = false;
 $preguntaEdit = null;
 if (isset($_GET['editar'])) {
-    $id_edit = $_GET['editar'];
+    $idEdit = (int)$_GET['editar'];
     foreach ($preguntas as $p) {
-        if ($p['id_pregunta'] == $id_edit) {
+        if ($p['id_pregunta'] == $idEdit) {
             $editando = true;
             $preguntaEdit = $p;
             break;
@@ -172,161 +71,117 @@ if (isset($_GET['editar'])) {
     }
 }
 ?>
-
-<!-- PARTE HTML -->
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gestión de Preguntas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+    <title>Gestión de Preguntas RIASEC</title>
+    <link rel="stylesheet" href="/RIASEC/STYLE/Base.css">
+    <link rel="stylesheet" href="/RIASEC/STYLE/Emergente.css">
+    <link rel="stylesheet" href="/RIASEC/STYLE/Formulario.css">
+    <link rel="stylesheet" href="/RIASEC/STYLE/DarkMode.css">
 </head>
 <body>
-    <div id="user-menu" style="text-align:right;margin:1em;"></div>
-
+    <!-- Botón modo oscuro/claro adaptado de DarkMode -->
+    <div class="dark-mode-switch" id="darkModeSwitch">
+        <div class="circle">
+            <span class="sun"><svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="#FCDE5B"/><g stroke="#FCDE5B" stroke-width="2"><line x1="16" y1="2" x2="16" y2="8"/><line x1="16" y1="24" x2="16" y2="30"/><line x1="2" y1="16" x2="8" y2="16"/><line x1="24" y1="16" x2="30" y2="16"/><line x1="6.34" y1="6.34" x2="10.49" y2="10.49"/><line x1="21.51" y1="21.51" x2="25.66" y2="25.66"/><line x1="6.34" y1="25.66" x2="10.49" y2="21.51"/><line x1="21.51" y1="10.49" x2="25.66" y2="6.34"/></g></svg></span>
+            <span class="moon"><svg width="32" height="32" viewBox="0 0 32 32"><path d="M22 16a10 10 0 1 1-10-10c0 5.52 4.48 10 10 10z" fill="#fff"/></svg></span>
+        </div>
+    </div>
+    <nav id="user-menu" class="user-menu-top"></nav>
     <main>
-        <!-- ===================== BLOQUE: OPCIONES DE RESPUESTA ===================== -->
-        <!-- Este bloque permite al administrador gestionar las opciones de respuesta que aparecen en el test. -->
-        <h2>Opciones de respuesta</h2>
-        <!-- Formulario para agregar o editar una opción de respuesta. -->
-        <form method="post" style="margin-bottom:2em;">
-            <fieldset>
-                <legend><?= $editandoOpcion ? 'Editar opción' : 'Agregar nueva opción' ?></legend>
-                <!-- ID oculto para edición de opción -->
-                <input type="hidden" name="id_opcion_edit" value="<?= $editandoOpcion ? htmlspecialchars($opcionEdit['id_opcion']) : '' ?>">
-                <!-- Bandera para distinguir acción de opción -->
-                <input type="hidden" name="accion_opcion" value="1">
-                <!-- Campo para el valor numérico de la opción (0-100, solo números, máx 3 dígitos) -->
-                <label for="valor">Valor (0-100):</label>
-                <input type="number" id="valor" name="valor" min="0" max="100" maxlength="3" placeholder="0-100" required pattern="^[0-9]{1,3}$" value="<?= $editandoOpcion ? htmlspecialchars($opcionEdit['valor']) : '' ?>">
-                <br>
-                <!-- Campo para la descripción textual de la opción -->
-                <label for="descripcion">Descripción:</label>
-                <input type="text" id="descripcion" name="descripcion" maxlength="100" required value="<?= $editandoOpcion ? htmlspecialchars($opcionEdit['descripcion']) : '' ?>">
-                <br>
-                <!-- Botón para guardar la opción -->
-                <button type="submit"><?= $editandoOpcion ? 'Actualizar' : 'Agregar' ?></button>
-                <!-- Enlace para cancelar la edición de opción -->
-                <?php if ($editandoOpcion): ?>
-                    <a href="Preguntas.php">Cancelar</a>
-                <?php endif; ?>
-            </fieldset>
-        </form>
-        <!-- Tabla que muestra todas las opciones de respuesta existentes -->
-        <table border="1" aria-label="Opciones de respuesta" style="margin-bottom:2em;">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Valor</th>
-                    <th>Descripción</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($opciones)): ?>
-                    <tr><td colspan="4">No hay opciones registradas.</td></tr>
-                <?php else: ?>
-                    <?php foreach ($opciones as $o): ?>
+        <h1>Gestión de Preguntas RIASEC</h1>
+        <?php if ($msg): ?>
+            <div class="msg-status"> <?= htmlspecialchars($msg) ?> </div>
+        <?php endif; ?>
+        <div class="paginacion-categorias">
+            <?php foreach ($categorias as $key => $nombre): ?>
+                <button type="button" onclick="window.location='?categoria=<?= $key ?>'" class="btn-cat<?= $catActual == $key ? ' active' : '' ?>"> <?= $nombre ?> </button>
+            <?php endforeach; ?>
+        </div>
+        <section>
+            <h2>Preguntas de la categoría: <span class="categoria-seleccionada"> <?= $categorias[$catActual] ?> </span></h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Texto</th>
+                        <th>Categoría</th>
+                        <th style="text-align:center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($preguntas as $p): ?>
                         <tr>
-                            <td><?= htmlspecialchars($o['id_opcion']) ?></td>
-                            <td><?= htmlspecialchars($o['valor']) ?></td>
-                            <td><?= htmlspecialchars($o['descripcion']) ?></td>
-                            <td>
-                                <!-- Enlaces para editar o eliminar la opción -->
-                                <a href="Preguntas.php?editar_opcion=<?= $o['id_opcion'] ?>">Editar</a>
-                                |
-                                <a href="Preguntas.php?eliminar_opcion=<?= $o['id_opcion'] ?>" onclick="return confirm('¿Seguro que deseas eliminar esta opción?');">Eliminar</a>
+                            <td style="font-size:1.35em;font-weight:700;letter-spacing:.5px;"><?= htmlspecialchars($p['texto']) ?></td>
+                            <td style="font-size:1.25em;font-weight:600;"><?= $categorias[$p['categoria']] ?></td>
+                            <td style="text-align:center;">
+                                <div style="display:flex;gap:.5em;justify-content:center;align-items:center;">
+                                    <form method="get" style="display:inline;">
+                                        <input type="hidden" name="categoria" value="<?= $catActual ?>">
+                                        <input type="hidden" name="editar" value="<?= $p['id_pregunta'] ?>">
+                                        <button type="submit" class="btn-accion" title="Editar" style="min-width:40px;max-width:40px;padding:.5em .5em;display:flex;align-items:center;justify-content:center;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M4 20h4.586a2 2 0 0 0 1.414-.586l9-9a2 2 0 0 0 0-2.828l-2.586-2.586a2 2 0 0 0-2.828 0l-9 9A2 2 0 0 0 4 15.414V20z"/><path stroke="currentColor" stroke-width="2" d="M14.5 7.5l2 2"/></svg>
+                                        </button>
+                                    </form>
+                                    <form method="get" style="display:inline;" onsubmit="return confirm('¿Seguro que desea eliminar esta pregunta?');">
+                                        <input type="hidden" name="categoria" value="<?= $catActual ?>">
+                                        <input type="hidden" name="eliminar" value="<?= $p['id_pregunta'] ?>">
+                                        <button type="submit" class="btn-accion" title="Eliminar" style="min-width:40px;max-width:40px;padding:.5em .5em;display:flex;align-items:center;justify-content:center;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M6 7h12M9 7V5a3 3 0 0 1 6 0v2m-9 0v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V7"/></svg>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
-
-        <!-- ===================== BLOQUE: PREGUNTAS DEL TEST ===================== -->
-        <!-- Este bloque permite al administrador gestionar las preguntas del test vocacional. -->
-        <h1>Gestión de Preguntas</h1>
-
-        <!-- Mensaje de estado (éxito o error) para cualquier acción -->
-        <?php if ($msg): ?>
-            <p><strong><?= htmlspecialchars($msg) ?></strong></p>
-        <?php endif; ?>
-
-        <!-- Formulario para agregar o editar una pregunta del test. -->
-        <form method="post" style="margin-bottom:2em;">
-            <fieldset>
-                <legend><?= $editando ? 'Editar pregunta' : 'Agregar nueva pregunta' ?></legend>
-                <!-- Campo oculto para el ID de la pregunta al editar -->
-                <input type="hidden" name="id_edit" value="<?= $editando ? htmlspecialchars($preguntaEdit['id_pregunta']) : '' ?>">
-                <!-- Campo de texto para el enunciado de la pregunta -->
-                <label for="texto">Texto de la pregunta:</label><br>
-                <input type="text" id="texto" name="texto" maxlength="255" required value="<?= $editando ? htmlspecialchars($preguntaEdit['texto']) : '' ?>"><br>
-                <!-- Selector de categoría RIASEC -->
-                <label for="categoria">Categoría:</label>
-                <select id="categoria" name="categoria" required>
-                    <option value="">Seleccione...</option>
-                    <?php foreach (['R','I','A','S','E','C'] as $cat): ?>
-                        <option value="<?= $cat ?>" <?= $editando && $preguntaEdit['categoria']==$cat ? 'selected' : '' ?>><?= $cat ?></option>
+                </tbody>
+            </table>
+            <?php
+            $totalPaginas = ceil($totalPreguntas / $preguntasPorPagina);
+            if ($totalPaginas > 1): ?>
+            <div style="display:flex;justify-content:center;gap:.5em;margin:2em 0;">
+                <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+                    <a href="?categoria=<?= $catActual ?>&pag=<?= $i ?>" class="btn-accion" style="min-width:36px;max-width:36px;padding:.4em .4em;<?= $paginaActual == $i ? 'background:#0a2342;color:#fff;' : '' ?>"> <?= $i ?> </a>
+                <?php endfor; ?>
+            </div>
+            <?php endif; ?>
+            <form action="Opciones.php" method="get" style="margin-top:2em; text-align:center;">
+                <button type="submit" class="btn-accion">&#8592; Volver a opciones</button>
+            </form>
+        </section>
+        <section>
+            <h2>Agregar nueva pregunta</h2>
+            <form method="post">
+                <select name="categoria_nueva" class="select-categoria" required>
+                    <option value="">Seleccione categoría</option>
+                    <?php foreach ($categorias as $key => $nombre): ?>
+                        <option value="<?= $key ?>"<?= $catActual == $key ? ' selected' : '' ?>><?= $nombre ?></option>
                     <?php endforeach; ?>
-                </select><br>
-                <!-- Botón para enviar el formulario de pregunta -->
-                <button type="submit"><?= $editando ? 'Actualizar' : 'Agregar' ?></button>
-                <!-- Enlace para cancelar la edición de pregunta -->
-                <?php if ($editando): ?>
-                    <a href="Preguntas.php">Cancelar</a>
-                <?php endif; ?>
-            </fieldset>
-        </form>
-
-        <!-- Sección que agrupa las preguntas por categoría RIASEC -->
-        <h2>Preguntas por categoría</h2>
-        <?php foreach ($porCategoria as $cat => $pregs): ?>
-            <section style="margin-bottom:1.5em;">
-                <!-- Título de la categoría y cantidad de preguntas -->
-                <h3>Categoría <?= $cat ?> (<?= count($pregs) ?> preguntas)</h3>
-                <!-- Si no hay preguntas en la categoría -->
-                <?php if (empty($pregs)): ?>
-                    <p>No hay preguntas en esta categoría.</p>
-                <?php else: ?>
-                    <!-- Tabla de preguntas de la categoría -->
-                    <table border="1" aria-label="Preguntas <?= $cat ?>">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Texto</th>
-                                <th>Puntaje máximo</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Iterar sobre cada pregunta de la categoría -->
-                            <?php foreach ($pregs as $p): ?>
-                                <tr>
-                                    <!-- ID de la pregunta -->
-                                    <td><?= htmlspecialchars($p['id_pregunta']) ?></td>
-                                    <!-- Texto de la pregunta -->
-                                    <td><?= htmlspecialchars($p['texto']) ?></td>
-                                    <!-- Puntaje máximo posible para la pregunta -->
-                                    <td><?= $maxValor ?></td>
-                                    <!-- Acciones disponibles: editar o eliminar la pregunta -->
-                                    <td>
-                                        <a href="Preguntas.php?editar=<?= $p['id_pregunta'] ?>">Editar</a>
-                                        |
-                                        <a href="Preguntas.php?eliminar=<?= $p['id_pregunta'] ?>" onclick="return confirm('¿Seguro que deseas eliminar esta pregunta?');">Eliminar</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php endif; ?>
-            </section>
-        <?php endforeach; ?>
-
-        <!-- Bloque para volver al menú de opciones administrativas -->
-        <form action="Opciones.php" method="get" style="margin-top:2em;">
-            <button type="submit">Volver a Opciones</button>
-        </form>
+                </select>
+                <input type="text" name="texto_nueva" class="input-pregunta" placeholder="Texto de la pregunta" required>
+                <button type="submit" name="agregar_pregunta" class="btn-accion">Agregar pregunta</button>
+            </form>
+        </section>
+        <br>
+        <?php if ($editando && $preguntaEdit): ?>
+        <section>
+            <hr>
+            <h2>Editar pregunta</h2>
+            <form method="post">
+                <input type="hidden" name="id_editar" value="<?= $preguntaEdit['id_pregunta'] ?>">
+                <select name="categoria_editar" class="select-categoria" required>
+                    <?php foreach ($categorias as $key => $nombre): ?>
+                        <option value="<?= $key ?>"<?= $preguntaEdit['categoria'] == $key ? ' selected' : '' ?>><?= $nombre ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <input type="text" name="texto_editar" class="input-pregunta" value="<?= htmlspecialchars($preguntaEdit['texto']) ?>" required>
+                <button type="submit" name="editar_pregunta" class="btn-accion">Guardar cambios</button>
+            </form>
+        </section>
+        <?php endif; ?>
     </main>
-    <script src="/RIASEC/JAVASCRIPT/login.js"></script>
+    <script src="/RIASEC/JAVASCRIPT/Recursos.js"></script>
 </body>
 </html>

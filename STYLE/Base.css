@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@600;800&family=Roboto:wght@400;500&display=swap'); /* Fuentes principales */
+
+/* === SECCIÓN: TABLAS GENERALES === */
+table{width:100%;border-collapse:separate;border-spacing:0;border-radius:18px;box-shadow:0 4px 18px rgba(21,101,192,.12);overflow:hidden;} /* Tabla base */
+thead{background:#1565c0;color:#fff;letter-spacing:.7px;} /* Cabecera tabla */
+tbody{background:#fff;color:#222;} /* Cuerpo tabla */
+tr{transition:.3s;} /* Fila tabla */
+th{padding:1.15em 1.3em;font-size:1.18em;font-weight:800;text-align:left;border-bottom:2px solid #1565c0;background:#0a2342;color:#fff;} /* Encabezado */
+td{padding:1.1em 1.3em;font-size:1.25em;text-align:left;border-bottom:1px solid #e3eafc;background:#fff;color:#222;font-weight:600;} /* Celdas */
+tr:hover td{background:#347ec9;color:#fff;} /* Hover fila */
+body.active thead{background:#223a5f;color:#eaf6ff;} /* Cabecera tabla oscuro */
+body.active tbody{background:#16203a;color:#eaf6ff;} /* Cuerpo tabla oscuro */
+body.active th{border-bottom:2px solid #90caf9;background:#1565c0;color:#eaf6ff;}/* Encabezado oscuro */
+body.active td{border-bottom:1px solid #223a5f;background:#16203a;color:#eaf6ff;}/* Celdas oscuras */
+body.active tr:hover td{background:#265686;color:#fff;} /* Hover fila oscuro */
+
+/* === SECCIÓN: ESTILOS BASE Y MODO OSCURO === */
+body{background:#f5f7fa;color:#222;font-family:'Inter','Roboto',Arial,sans-serif;transition:background .5s,color .5s} /* Fondo claro base */
+body.active{background:#0a1220;color:#eaf6ff} /* Modo oscuro */
+
+/* === SECCIÓN: CONTENEDOR PRINCIPAL === */
+main{max-width:1000px;min-width:480px;min-height:520px;margin:2em auto;border-radius:18px;box-shadow:0 8px 32px rgba(10,35,66,.22);padding:1.1em;background:#fff;transition:.5s;font-size:1.15em} /* Contenedor principal */
+body.active main{background:#16203a;color:#eaf6ff} /* Contenedor oscuro */
+
+/* === SECCIÓN: TIPOGRAFÍA Y TÍTULOS === */
+h1{text-align:center;margin:1.2em 0;display:flex;gap:.7em;justify-content:center;font-size:2.6em;letter-spacing:1.5px;color:#1565c0;font-family:'Montserrat','Inter',Arial,sans-serif;font-weight:800;transition:.5s} /* Título principal */
+body.active h1{color:#eaf6ff} /* Título oscuro */
+
+/* === SECCIÓN: BOTONES GENERALES === */
+button,.btn-pag{border:none;border-radius:99px;padding:1em 2em;font-size:1.15em;font-family:'Montserrat','Inter',Arial,sans-serif;font-weight:600;cursor:pointer;margin:.2em .1em;box-shadow:0 2px 8px rgba(10,35,66,.1);text-decoration:none;display:inline-block;background:#1565c0;color:#fff;letter-spacing:.5px;transition:.3s;outline:none} /* Botones base */
+button:hover,.btn-pag:hover{background:#0a2342;transform:translateY(-2px)scale(1.04);box-shadow:0 4px 16px rgba(10,35,66,.18)} /* Hover botones */
+body.active button,body.active .btn-pag{background:#223a5f;color:#eaf6ff} /* Botones oscuro */
+body.active button:hover,body.active .btn-pag:hover{background:#1565c0;color:#fff} /* Hover oscuro */
+
+/* === SECCIÓN: INDICADORES Y CAMPOS DE TEXTO === */
+.pregunta-indicador{font-size:1.18em;font-family:'Montserrat','Inter',Arial,sans-serif;font-weight:700;color:#1565c0;background:#e3eafc;border-radius:12px;padding:.3em 1.1em;margin:0 .7em;box-shadow:0 2px 8px rgba(21,101,192,.1);letter-spacing:.5px;transition:.5s;display:flex;align-items:center;justify-content:center} /* Indicador pregunta */
+body.active .pregunta-indicador{color:#eaf6ff;background:#223a5f;box-shadow:0 2px 8px rgba(58,141,222,.18)} /* Indicador oscuro */
+input[type="text"],input[type="password"],input[type="email"],input[type="number"]{width:96.5%;height:48px;padding:0 1em;font-size:1.15em;border:2px solid #1565c0;border-radius:12px;background:linear-gradient(90deg,#e3eafc 0%,#f5f7fa 100%);color:#222;box-shadow:0 2px 12px rgba(21,101,192,.12);margin-bottom:1em;transition:background .4s,border-color .4s,color .4s,box-shadow .4s,transform .3s;outline:none;} /* Input base */
+input[type="text"]:hover,input[type="password"]:hover,input[type="email"]:hover,input[type="number"]:hover{background:linear-gradient(90deg,#e3eafc 0%,#90caf9 100%);border-color:#0a2342;box-shadow:0 4px 18px rgba(21,101,192,.18);transform:scale(1.03);} /* Hover input */ 
+input[type="text"]:focus,input[type="password"]:focus,input[type="email"]:focus,input[type="number"]:focus{background:linear-gradient(90deg,#90caf9 0%,#e3eafc 100%);border-color:#1565c0;box-shadow:0 4px 24px rgba(21,101,192,.22);transform:scale(1.04);} /* Focus input */
+select{width:100%;height:48px;padding:0 1em;font-size:1.15em;border:2px solid #1565c0;border-radius:12px;background:linear-gradient(90deg,#e3eafc 0%,#f5f7fa 100%);color:#222;box-shadow:0 2px 12px rgba(21,101,192,.12);margin-bottom:1em;transition:background .4s,border-color .4s,color .4s,box-shadow .4s,transform .3s;appearance:none;-webkit-appearance:none;-moz-appearance:none;} /* Select base */
+select:hover{background:linear-gradient(90deg,#e3eafc 0%,#90caf9 100%);border-color:#0a2342;box-shadow:0 4px 18px rgba(21,101,192,.18);transform:scale(1.03);}/* Hover select */
+select:focus{border-color:#1565c0;background:linear-gradient(90deg,#90caf9 0%,#e3eafc 100%);box-shadow:0 4px 24px rgba(21,101,192,.22);transform:scale(1.04);outline:none;} /* Select base */
+select:focus {border-color:#0a2342;background:#e3eafc;outline:none;} /* Select base focus */
+body.active input[type="text"],body.active input[type="password"],body.active input[type="email"],body.active input[type="number"]{background:linear-gradient(90deg,#223a5f 0%,#16203a 100%);color:#eaf6ff;border-color:#90caf9;box-shadow:0 2px 16px #223a5f88;transition:background .4s,border-color .4s,color .4s,box-shadow .4s,transform .3s;}/* Input oscuro */
+body.active input[type="text"]:hover,body.active input[type="password"]:hover,body.active input[type="email"]:hover,body.active input[type="number"]:hover{background:linear-gradient(90deg,#223a5f 0%,#1565c0 100%);border-color:#347ec9;box-shadow:0 4px 24px #1565c088;transform:scale(1.03);}/* Hover input oscuro */
+body.active input[type="text"]:focus,body.active input[type="password"]:focus,body.active input[type="email"]:focus,body.active input[type="number"]:focus{background:linear-gradient(90deg,#1565c0 0%,#223a5f 100%);border-color:#90caf9;box-shadow:0 4px 32px #1565c0cc;transform:scale(1.04);}/* Focus input oscuro */
+body.active select{background:linear-gradient(90deg,#223a5f 0%,#16203a 100%);color:#eaf6ff;border-color:#90caf9;box-shadow:0 2px 16px #223a5f88;transition:background .4s,border-color .4s,color .4s,box-shadow .4s,transform .3s;} /* Select oscuro */
+body.active select:hover{background:linear-gradient(90deg,#223a5f 0%,#1565c0 100%);border-color:#347ec9;box-shadow:0 4px 24px #1565c088;transform:scale(1.03);} /* Hover select oscuro */
+body.active select:focus{border-color:#90caf9;background:linear-gradient(90deg,#1565c0 0%,#223a5f 100%);box-shadow:0 4px 32px #1565c0cc;transform:scale(1.04);outline:none;} /* Select oscuro focus */
+select option {border-radius:12px;padding:.7em 1em;} /* Opciones select */
+select option:checked, select option:hover {background:#e3eafc;color:#222;} /* Opción activa */
+body.active select option {background:#16203a;color:#eaf6ff;border-radius:12px;transition:.3s;}
+body.active select option:checked, body.active select option:hover {background:#223a5f;color:#eaf6ff;}
+
+/* === SECCIÓN: FIELDSET Y LEGEND === */
+fieldset{border-radius:14px;margin-bottom:1.2em;padding:1.2em;border:2px solid #1565c0;background:#e3eafc;transition:.5s;font-size:1.15em} /* Fieldset base */
+body.active fieldset{background:#223a5f;border-color:#1e3a5c} /* Fieldset oscuro */
+legend{font-size:1.7em;font-weight:900;color:#fff;background:linear-gradient(90deg,#1565c0 0%,#3a8dde 100%);padding:.25em 1em;border-radius:12px;box-shadow:0 2px 12px rgba(21,101,192,.1);letter-spacing:.5px;transition:.5s} /* Legend */
+body.active legend{background:linear-gradient(90deg,#223a5f 0%,#347ec9b9 100%);box-shadow:0 2px 12px rgba(58,141,222,.18)} /* Legend oscuro */
+
+/* === SECCIÓN: LABELS, PARÁGRAFOS Y TEXTOS === */
+label{display:block;margin:.5em 0;padding-left:.5em;cursor:pointer;color:#222;transition:.5s} /* Label base */
+body.active label{color:#eaf6ff} /* Label oscuro */
+p{text-align:center;font-size:1.25em;color:#0a2342;transition:.5s} /* Párrafo base */
+body.active p{color:#1565c0} /* Párrafo oscuro */
+
+/* === SECCIÓN: TARJETAS DE OPCIÓN (RADIO) Y ANIMACIONES === */
+.card-option{display:flex;align-items:center;gap:.7em;background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(10,35,66,.1);border:2px solid #e3eafc;padding:.6em 1.1em;margin-bottom:.5em;cursor:pointer;transition:.3s;position:relative} /* Card opción */
+.card-option:hover{box-shadow:0 4px 18px rgba(21,101,192,.18);border-color:#1565c0} /* Hover card */
+.card-option input[type=radio]{appearance:none;width:24px;height:24px;border-radius:50%;border:2px solid #1565c0;background:#fff;margin:0 .5em 0 0;outline:none;transition:.3s;box-shadow:0 0 0 0 rgba(21,101,192,0);display:flex;align-items:center;justify-content:center} /* Radio estilizado */
+.card-option input[type=radio]:checked{border-color:#1565c0} /* Radio checked */
+.card-option .card-radio{position:absolute;width:24px;height:24px;pointer-events:none;display:flex;align-items:center;justify-content:center} /* Radio contenedor */
+.card-option input[type=radio]:checked+.card-radio::before{content:'';width:12px;height:12px;border-radius:50%;background:#1565c0;box-shadow:0 0 0 0 rgba(21,101,192,.45);animation:radioPulse 1.6s cubic-bezier(.4,0,.2,1) infinite} /* Punto pulse */
+.card-option input[type=radio]:not(:checked)+.card-radio::before{content:'';width:12px;height:12px;border-radius:50%;background:#e3eafc} /* Punto empty */
+@keyframes radioPulse{0%{box-shadow:0 0 0 0 rgba(21,101,192,.25)}70%{box-shadow:0 0 0 32px rgba(21,101,192,0)}100%{box-shadow:0 0 0 0 rgba(21,101,192,0)}} /* Animación radio */
+.card-option input[type=radio]:checked~.card-text{background:linear-gradient(90deg,#1565c0 0%,#3a8dde 100%);color:#fff;border-radius:12px;padding:.2em .7em;box-shadow:0 0 0 2px #1565c0;transition:.3s} /* Texto activo */
+.card-text{font-size:1.13em;font-family:'Inter','Roboto',Arial,sans-serif;color:#222;font-weight:500;line-height:1.2;transition:.3s} /* Texto card */
+body.active .card-option{background:#16203a;border-color:#223a5f} /* Card oscuro */
+body.active .card-option:hover{border-color:#3a8dde;box-shadow:0 4px 18px rgba(58,141,222,.18)} /* Hover card oscuro */
+body.active .card-option input[type=radio]{border-color:#3a8dde;background:#223a5f} /* Radio oscuro */
+body.active .card-option input[type=radio]:checked+.card-radio::before{background:#3a8dde} /* Punto checked oscuro */
+body.active .card-option input[type=radio]:not(:checked)+.card-radio::before{background:#2e5083} /* Punto empty oscuro */
+body.active .card-option input[type=radio]:checked~.card-text{background:linear-gradient(90deg,#3d73c48e 0%,#265686af 100%);color:#eaf6ff;box-shadow:0 0 0 2px #3a8dde} /* Texto activo oscuro */
+body.active .card-text{color:#eaf6ff} /* Texto card oscuro */
+
+/* === SECCIÓN: MENÚ USUARIO Y CONTROLES SUPERIORES === */
+#user-menu{position:fixed;top:1em;right:1em;z-index:201;display:flex;align-items:center;gap:1em;background:none;box-shadow:none;margin:0;padding:0} /* Menú usuario */
+#user-menu .user-btn{margin:0;height:48px;min-width:120px;font-size:1.5em;padding:1em 2.5em;border-radius:999px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(10,35,66,.14)} /* Botón usuario */
+
+/* === SECCIÓN: ENCABEZADOS, SUBTÍTULOS Y SECCIONES DE RESULTADOS === */
+.resultados-header{margin-bottom:1.5em} /* Header resultados */
+.titulo-principal{font-size:2.4em;font-weight:800;color:#1565c0;text-align:center;margin-bottom:.5em;letter-spacing:1.2px} /* Título principal resultado */
+.subtitulo {font-size: 1.5em; font-weight: 700; color: #1565c0; margin: 1.2em 0 .7em 0; text-align: left; letter-spacing: .7px;} /* Subtítulo */
+body.active .subtitulo {color: #eaf6ff;} /* Subtítulo oscuro */
+.historial-section{margin-bottom:2em} /* Sección historial */
+.resultado-section {margin: 2em 0; display: flex; flex-wrap: wrap; gap: 2em; justify-content: space-between;} /* Sección resultados */
+
+/* === SECCIÓN: TABLAS RESPONSIVAS === */
+.tabla-responsive {overflow-x: auto; border-radius: 14px; box-shadow: 0 2px 12px rgba(21,101,192,.08); background: #e3eafc; padding: 2em; border: 2px solid #1565c0;} /* Contenedor tabla */
+body.active .tabla-responsive {background: #223a5f; border-color: #90caf9;} /* Contenedor tabla oscuro */
+.tabla-historial{width:100%;border-collapse:collapse;font-size:1.08em;background:#fff;border-radius:12px;overflow:hidden} /* Tabla historial */
+.tabla-historial th,.tabla-historial td{padding:.7em 1em;text-align:center;border-bottom:1px solid #e3eafc} /* Celdas tabla */
+.tabla-historial th{background:#1565c0;color:#fff;font-weight:700} /* Cabecera tabla */
+.tabla-historial tr:last-child td{border-bottom:none} /* Última fila */
+.tabla-historial tr:hover{background:#e3eafc} /* Hover fila */
+
+/* === SECCIÓN: MENÚ ADMIN Y BOTONES DE OPCIÓN === */
+.opciones-admin-menu{display:flex;flex-direction:column;gap:1.2em;width:100%;max-width:480px;margin:2em auto} /* Menú admin */
+.opcion-form{width:100%} /* Form opción */
+.opcion-btn{width:100%;min-height:56px;font-size:1.25em;border-radius:18px;box-sizing:border-box} /* Botón opción */
+body.active .opcion-btn{background:#223a5f;color:#eaf6ff} /* Botón opción oscuro */
+
+/* === SECCIÓN: SECCIÓN DE RESULTADOS Y ARTÍCULOS === */
+.puntajes-article,.dominantes-article,.perfil-article{flex:1 1 300px;background:#e3eafc;border-radius:14px;box-shadow:0 2px 12px rgba(21,101,192,.08);padding:1.2em;margin-bottom:1.2em} /* Artículos */
+body.active .puntajes-article,body.active .dominantes-article,body.active .perfil-article{background:#223a5f;color:#eaf6ff} /* Artículos oscuros */
+
+/* === SECCIÓN: LISTAS, ITEMS Y ANIMACIONES === */
+.puntajes-lista,.dominantes-lista{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.7em} /* Listas */
+.puntaje-item,.dominante-item{display:flex;align-items:center;background:#fff;border-radius:18px;box-shadow:0 2px 8px rgba(21,101,192,.08);padding:.7em 1.2em;font-size:1.13em;border:none;transition:box-shadow .4s,background .4s,transform .3s;position:relative;gap:1.2em;animation:fadeIn .7s cubic-bezier(.4,0,.2,1)} /* Item */
+.puntaje-item:hover,.dominante-item:hover{box-shadow:0 4px 16px rgba(21,101,192,.18);background:#e3eafc;transform:scale(1.03)} /* Hover item */
+body.active .puntaje-item,body.active .dominante-item{background:#223a5f;color:#eaf6ff} /* Item oscuro */
+body.active .puntaje-item:hover,body.active .dominante-item:hover{background:#16203a;box-shadow:0 4px 16px rgba(144,202,249,.18);color:#90caf9} /* Hover oscuro */
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}} /* Fade in */
+
+/* === SECCIÓN: CÍRCULOS Y TIPOS DE PUNTAJES === */
+.puntaje-circulo{display:flex;flex-direction:column;align-items:center;justify-content:center;width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 60% 40%,#e3eafc 70%,#1565c0 100%);box-shadow:0 4px 16px rgba(21,101,192,.14);border:3px solid #1565c0;font-family:'Montserrat','Inter',Arial,sans-serif;font-weight:800;color:#1565c0;transition:background .4s,color .4s,box-shadow .4s;margin-right:1em;animation:popIn .7s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden} /* Circulo puntaje */
+.puntaje-letra{font-size:2em;color:#1565c0;font-weight:900;letter-spacing:1px;margin-bottom:-2px;transition:color .4s} /* Letra */
+.puntaje-numero{font-size:1.22em;color:#0a2342;font-weight:800;margin-top:-2px;letter-spacing:.5px;transition:color .4s} /* Numero */
+body.active .puntaje-circulo{background:radial-gradient(circle at 60% 40%,#223a5f 70%,#1565c0 100%);border-color:#90caf9;color:#eaf6ff} /* Circulo oscuro */
+body.active .puntaje-letra{color:#90caf9} /* Letra oscuro */
+body.active .puntaje-numero{color:#eaf6ff} /* Numero oscuro */
+@keyframes popIn{0%{transform:scale(0.7);opacity:0}80%{transform:scale(1.1);opacity:1}100%{transform:scale(1);opacity:1}} /* Pop in */
+
+/* === SECCIÓN: EXPLICACIONES Y NARRATIVAS === */
+.explicacion{font-size:1em;color:#0a2342;margin-left:.7em;font-style:italic;transition:color .4s;flex:1} /* Explicación */
+body.active .explicacion{color:#fff} /* Explicación oscuro */
+.dominante-item .letra-dominante{font-size:2em;font-weight:800;color:#1565c0;margin-right:1em;background:#e3eafc;border-radius:12px;border:3px solid #1565c0;box-shadow:0 1px 4px rgba(21,101,192,.08);transition:background .4s,color .4s,border-color .4s;width:62px;height:62px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;}/* Letra dominante - cuadrado fijo y centrado */
+body.active .dominante-item .letra-dominante{color:#eaf6ff;background:#223a5f;border-color:#90caf9;width:62px;height:62px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;} /* Letra dominante oscuro */
+.explicacion-dominante{font-size:.98em;color:#0a2342;margin-left:.5em;font-style:italic;transition:color .4s} /* Explicación dominante */
+body.active .explicacion-dominante{color:#fff;font-weight:bold} /* Explicación dominante oscuro */
+.perfil-narrativo{font-size:1.13em;line-height:1.6;background:#fff;border-radius:10px;padding:1em;margin-top:.7em;box-shadow:0 1px 6px rgba(21,101,192,.07)} /* Perfil narrativo */
+body.active .perfil-narrativo{background:#16203a;color:#eaf6ff} /* Perfil narrativo oscuro */
+
+/* === SECCIÓN: MENSAJES E ICONOGRAFÍA === */
+.info{font-size:1.15em;color:#0a2342;background:#e3eafc;border-radius:8px;padding:.7em 1em;margin:1em 0;text-align:center} /* Info */
+body.active .info{color:#90caf9;background:#223a5f} /* Info oscuro */
+.error{font-size:1.15em;color:#c62828;background:#ffebee;border-radius:8px;padding:.7em 1em;margin:1em 0;text-align:center} /* Error */
+body.active .error{color:#ff8a80;background:#2e5083} /* Error oscuro */
+
+/* === SECCIÓN: PIE Y BOTONES DE NAVEGACIÓN === */
+.resultados-footer{margin-top:2em;text-align:center} /* Footer resultados */
+.volver-form{display:inline-block} /* Volver form */
+
+/* === ESTILOS PARA GESTIÓN DE PREGUNTAS === */
+.btn-accion:hover, .btn-cat:hover, .btn-retorno:hover {background:#0a2342;color:#fff;transform:translateY(-2px)scale(1.04);box-shadow:0 4px 16px rgba(10,35,66,.18);text-decoration:none;} /* Hover botones */
+body.active .btn-accion, body.active .btn-cat, body.active .btn-retorno {background:#223a5f;color:#eaf6ff;} /* Botones oscuros */
+body.active .btn-accion:hover, body.active .btn-cat:hover, body.active .btn-retorno:hover {background:#1565c0;color:#fff;} /* Hover botones oscuros */
+.btn-cat.active {background:#0a2342!important;color:#fff!important;box-shadow:0 4px 16px rgba(10,35,66,.18);pointer-events:none;} /* Botón categoría activo */
+body.active .btn-cat.active {background:#1565c0!important;color:#fff!important;} /* Botón categoría activo oscuro */
+.acciones-pregunta .btn-accion {display:inline-block;margin:0 .1em;min-width:60px;max-width:100px;font-size:.95em;font-weight:600;overflow:hidden;} /* Botones acción */
+.categoria-seleccionada {font-weight:900;font-size:1.35em;color:#1565c0;background:transparent;padding:.2em .7em;border-radius:12px;transition:.5s;display:inline-block;}   /* Categoría seleccionada */
+.paginacion-categorias {display:flex;gap:1em;justify-content:center;margin:2em 0;flex-wrap:wrap;} /* Paginación categorías */

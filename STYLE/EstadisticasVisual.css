@@ -1,0 +1,82 @@
+/* === ESTADISTICAS VISUALES RIASEC === */
+
+/* Porcentaje debajo de la barra de dominancia */
+.dominancia-bar-porcentaje{display:block;text-align:center;margin-top:4px;font-size:1.1em;font-weight:700;color:#000000;letter-spacing:.5px} /* Color en modo claro de las letras del porcentaje */
+body.active .dominancia-bar-porcentaje{color:#ffffff} /* Color en modo oscuro de las letras del porcentaje */
+/* === MODO OSCURO ESTADISTICAS VISUALES RIASEC === */
+body.active .grafica-barras-encapsulado{background:#232b36;box-shadow:0 4px 18px #222a33cc} /* Caja general */
+body.active .grafica-barras-controles button{background:#333;color:#43ea7c;border-radius:12px;padding:18px 22px;font-size:1.5em;box-shadow:0 2px 8px #222a33cc} /* Botones base */
+body.active .grafica-barras-controles button.active{background:#43ea7c;color:#222;box-shadow:0 4px 16px #43ea7c44} /* Botón activo */
+body.active .grafica-barras-titulo{color:#43ea7c} /* Título de la gráfica */
+body.active .grafica-barras{display:flex;align-items:flex-end;gap:50px;height:150px;margin:0 auto;padding:0 18px;max-width:100%;justify-content:center;background:none;position:relative} /* Contenedor de barras */
+body.active .barra-letra{width:54px;border-radius:16px 16px 0 0;display:flex;align-items:flex-end;justify-content:center;position:relative;transition:.7s;box-shadow:0 4px 16px #222a33cc} /* Barra base */
+body.active .barra-letra.dominante{background:linear-gradient(180deg,#43ea7c 0%,#388e3c 100%)} /* Barra dominante */
+body.active .barra-letra.intermedio{background:linear-gradient(180deg,#ffe082 0%,#fbc02d 100%)} /* Barra intermedia */
+body.active .barra-letra.bajo{background:linear-gradient(180deg,#ff5252 0%,#d32f2f 100%)} /* Barra baja */
+body.active .barra-label{color:#43ea7c!important;position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);font-size:1.5em;font-weight:bold;letter-spacing:1px} /* Nombre letra R, I, A... */
+body.active .barra-valor{color:#43ea7c!important;position:absolute;top:-32px;left:50%;transform:translateX(-50%);font-size:1.3em;font-weight:bold} /* Valor numérico sobre barra */
+body.active .estadisticas-table{margin:0 auto;box-shadow:0 2px 12px #222a33cc;border-radius:12px;overflow:hidden;max-width:650px;min-width:320px;width:98vw;font-size:1.1em} /* Tabla base */
+body.active .estadisticas-table th{background:linear-gradient(90deg,#222 0%,#333 100%);color:#43ea7c;font-weight:900;font-size:1.35em;padding:18px 18px;border-bottom:2px solid #43ea7c} /* Cabecera */
+body.active .estadisticas-table td{padding:16px 18px;text-align:center;position:relative;font-size:1.25em;font-weight:700;color:#eee} /* Celdas */
+body.active .estadisticas-table td.col-letra{background:#232b36!important;font-weight:bold} /* Letra RIASEC */
+body.active .estadisticas-table td.col-preguntas{background:#1b2a1b!important} /* Cantidad de preguntas */
+body.active .estadisticas-table td.col-max{background:#2c2c1b!important} /* Máximo */
+body.active .estadisticas-table td.col-promedio{background:#1b2236!important} /* Promedio */
+body.active .estadisticas-table td.col-mediana{background:#2c1b2c!important} /* Mediana */
+body.active .estadisticas-table td.col-desv{background:#2c1b23!important} /* Desviación */
+body.active .estadisticas-table td.col-dominancia{background:#232b36!important}  /* Nivel de dominancia */
+body.active .dominancia-bar{background:#222;box-shadow:0 1px 4px #222a33cc} /* Contenedor barra */
+body.active .dominancia-bar-inner.dominante{background:linear-gradient(90deg,#43ea7c 0%,#1de9b6 100%)} /* Verde */
+body.active .dominancia-bar-inner.intermedio{background:linear-gradient(90deg,#ffe082 0%,#fff176 100%)} /* Amarillo */
+body.active .dominancia-bar-inner.bajo{background:linear-gradient(90deg,#ff5252 0%,#ff8a65 100%)}  /* Rojo */
+
+/* --- Contenedor principal de la gráfica --- */
+.grafica-barras-encapsulado{background:#f3f7fa;border-radius:18px;box-shadow:0 4px 18px #bdbdbd33;padding:18px 12px 38px;margin:18px auto 0;max-width:650px;min-width:320px;width:98vw;display:flex;flex-direction:column;align-items:center} /* Caja general */
+
+/* --- Controles de botones superiores --- */
+.grafica-barras-controles{display:flex;justify-content:center;gap:24px;margin-bottom:18px;width:100%} /* Contenedor de botones */
+.grafica-barras-controles button{background:#1976d2;color:#fff;border:none;border-radius:12px;padding:18px 22px;font-size:1.5em;font-family:'Montserrat','Inter',Arial,sans-serif;font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 2px 8px #bdbdbd33} /* Botones base */
+.grafica-barras-controles button.active{background:#43ea7c;color:#222;box-shadow:0 4px 16px #43ea7c44} /* Botón activo */
+
+/* --- Título de la gráfica --- */
+.grafica-barras-titulo{text-align:center;font-size:2em;font-weight:900;margin-bottom:18px;color:#1976d2;width:100%;letter-spacing:1.2px} /* Texto del título */
+
+/* --- Gráfica de barras principal --- */
+.grafica-barras{display:flex;align-items:flex-end;gap:50px;height:150px;margin:0 auto 0 auto;padding:0 18px 0 18px;max-width:100%;justify-content:center;background:none;position:relative} /* Contenedor de barras */
+
+/* --- Cada barra de la gráfica --- */
+.barra-letra{width:54px;border-radius:16px 16px 0 0;background:linear-gradient(180deg,#1976d2 0%,#90caf9 100%);display:flex;align-items:flex-end;justify-content:center;position:relative;transition:height .7s;box-shadow:0 4px 16px #bdbdbd33} /* Barra base */
+.barra-letra.dominante{background:linear-gradient(180deg,#43ea7c 0%,#388e3c 100%)} /* Barra dominante */
+.barra-letra.intermedio{background:linear-gradient(180deg,#ffe082 0%,#fbc02d 100%)} /* Barra intermedia */
+.barra-letra.bajo{background:linear-gradient(180deg,#ff5252 0%,#d32f2f 100%)} /* Barra baja */
+
+/* --- Etiquetas de cada barra --- */
+.barra-label{position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);font-size:1.5em;font-weight:bold;color:#1976d2;letter-spacing:1px} /* Nombre letra R, I, A... */
+.barra-valor{position:absolute;top:-32px;left:50%;transform:translateX(-50%);font-size:1.3em;color:#222;font-weight:bold} /* Valor numérico sobre barra */
+
+/* --- Contenedor centrado de tabla y gráfica --- */
+.tabla-responsive{display:flex;flex-direction:column;align-items:center;justify-content:center} /* Centrado general */
+
+/* --- Tabla de estadísticas --- */
+.estadisticas-table{margin:0 auto;box-shadow:0 2px 12px #bdbdbd33;border-radius:12px;overflow:hidden;max-width:650px;min-width:320px;width:98vw;font-size:1.1em} /* Tabla base */
+.estadisticas-table th{background:linear-gradient(90deg,#e0e0e0 0%,#f8f8f8 100%);color:#000000;font-weight:900;font-size:1.35em;padding:18px;border-bottom:2px solid #bdbdbd} /* Cabecera */
+.estadisticas-table td{padding:16px 18px;text-align:center;position:relative;font-size:1.25em;font-weight:700;color:#222} /* Celdas */
+
+/* --- Colores por tipo de columna --- */
+.estadisticas-table td.col-letra{background:#f3f7fa;font-weight:bold} /* Letra RIASEC */
+.estadisticas-table td.col-preguntas{background:#e8f5e9} /* Cantidad de preguntas */
+.estadisticas-table td.col-max{background:#fffde7} /* Máximo */
+.estadisticas-table td.col-promedio{background:#e3f2fd} /* Promedio */
+.estadisticas-table td.col-mediana{background:#fce4ec} /* Mediana */
+.estadisticas-table td.col-desv{background:#f3e5f5} /* Desviación */
+.estadisticas-table td.col-dominancia{background:#f9fbe7} /* Nivel de dominancia */
+
+/* --- Barra de porcentaje de dominancia --- */
+.dominancia-bar{width:80%;height:18px;border-radius:9px;background:#eee;margin:0 auto;overflow:hidden;box-shadow:0 1px 4px #ccc;position:relative} /* Contenedor barra */
+.dominancia-bar-inner{height:100%;border-radius:9px;transition:width .7s} /* Barra interior */
+.dominancia-bar-inner.dominante{background:linear-gradient(90deg,#43ea7c 0%,#1de9b6 100%)} /* Verde */
+.dominancia-bar-inner.intermedio{background:linear-gradient(90deg,#ffe082 0%,#fff176 100%)} /* Amarillo */
+.dominancia-bar-inner.bajo{background:linear-gradient(90deg,#ff5252 0%,#ff8a65 100%)} /* Rojo */
+
+/* --- Botón volver --- */
+.volver-form{display:flex;justify-content:center;align-items:center;margin:24px 0 0} /* Centrado del botón de retorno */

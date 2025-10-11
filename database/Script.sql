@@ -47,17 +47,6 @@ CREATE TABLE resultados (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 
-
--- Tabla: bitacora
-CREATE TABLE bitacora (
-    id_bitacora INT PRIMARY KEY AUTO_INCREMENT,
-    id_usuario INT,
-    accion VARCHAR(255) NOT NULL,
-    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
-);
-
-
 -- Datos iniciales
 INSERT INTO roles (nombre) VALUES ('Administrador'), ('Usuario');
 

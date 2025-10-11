@@ -1,0 +1,11 @@
+/* === INPUTS DEL FORMULARIO === */
+#user-form input{width:95%;margin:.7em 0;padding:1em;border:2px solid #1565c0;border-radius:8px;font-size:1.1em;background:#f5f7fa;color:#222;box-shadow:0 1px 4px rgba(10,35,66,.08);transition:.5s} /* Campo de entrada base */
+#user-form input:focus{border-color:#0a2342;outline:none;background:#e3eafc} /* Al enfocar */
+body.active #user-form input{background:#16203a;color:#eaf6ff;border-color:#90caf9} /* Campo oscuro */
+body.active #user-form input:focus{border-color:#1565c0;background:#182a47} /* Enfocado oscuro */
+
+/* === BOTÓN DEL FORMULARIO === */
+#user-form button{margin-top:.7em;font-size:1.15em;padding:1em;border-radius:8px;background:#1565c0;color:#fff;font-family:'Montserrat','Inter',Arial,sans-serif;font-weight:600;border:none;box-shadow:0 2px 8px rgba(10,35,66,.1);cursor:pointer;transition:.3s;outline:none} /* Botón base */
+#user-form button:hover{background:#0a2342;color:#fff;transform:translateY(-2px)scale(1.04);box-shadow:0 4px 16px rgba(10,35,66,.18)} /* Hover claro */
+body.active #user-form button{background:#223a5f;color:#eaf6ff} /* Botón oscuro */
+body.active #user-form button:hover{background:#1565c0;color:#fff} /* Hover oscuro */

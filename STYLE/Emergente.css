@@ -1,0 +1,30 @@
+/* === NOMBRE DE USUARIO EN MODAL === */
+.user-name{display:block;margin:0 auto 1.2em;background:#e3eafc;color:#1565c0;font-size:1.5em!important;font-weight:900!important;padding:.7em 1.5em!important;border-radius:999px;box-shadow:0 2px 12px rgba(10,35,66,.14);text-align:center;letter-spacing:1.2px;width:fit-content;border:4px solid #1565c0;animation:borderPulseLight 1.2s infinite alternate cubic-bezier(.4,1.6,.6,.8);transition:.5s} /* Estilo del nombre del usuario */
+@keyframes borderPulseLight{0%{border-color:#1565c0}50%{border-color:#90caf9}100%{border-color:#1565c0}} /* Pulso claro */
+body.active .user-name{background:#223a5f;color:#90caf9;box-shadow:0 2px 8px rgba(144,202,249,.1);border:5px solid #90caf9;animation:borderPulseDark 2s infinite alternate;font-size:1.5em!important;padding:1em 2em!important;font-weight:900!important} /* Versión oscura */
+@keyframes borderPulseDark{0%{border-color:#90caf9}50%{border-color:#1565c0}100%{border-color:#90caf9}} /* Pulso oscuro */
+
+/* === MODAL FONDO === */
+.user-modal{display:flex;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(20,30,50,.75);backdrop-filter:blur(24px);justify-content:center;align-items:center;transition:background .5s} /* Fondo del modal */
+
+/* === CONTENIDO DEL MODAL === */
+.user-modal-content{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;color:#222;border-radius:20px;box-shadow:0 12px 48px rgba(10,35,66,.32);padding:3em 2.5em 2.5em;min-width:340px;max-width:440px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.5s;z-index:10000;font-size:1.35em} /* Cuerpo principal */
+body.active .user-modal-content{background:#0a1833;color:#eaf6ff} /* Modo oscuro */
+
+/* === CAMPOS DE FORMULARIO === */
+.user-modal-content input[type=text],.user-modal-content input[type=email],.user-modal-content input[type=password],.user-modal-content input,.user-modal-content select{width:100%;max-width:320px;margin:.7em auto;padding:1em;border-radius:8px;font-size:1.1em;box-sizing:border-box;display:block;border:2px solid #1565c0;background:#f5f7fa;color:#222;box-shadow:0 1px 4px rgba(10,35,66,.08);transition:.5s} /* Inputs base */
+.user-modal-content input:focus,.user-modal-content select:focus{border-color:#0a2342;outline:none;background:#e3eafc} /* Enfocado */
+body.active .user-modal-content input,body.active .user-modal-content select{background:#223a5f;color:#eaf6ff;border-color:#90caf9} /* Campos oscuros */
+body.active .user-modal-content input:focus,body.active .user-modal-content select:focus{border-color:#1565c0;background:#182a47} /* Enfocado oscuro */
+
+/* === BOTONES PRINCIPALES === */
+.user-modal-content button,.user-modal-content .user-action{width:100%;margin:1em 0;display:block;padding:1.3em;font-size:1.25em;border-radius:12px;box-shadow:0 2px 12px rgba(10,35,66,.14);border:none;font-weight:bold;background:#1565c0;color:#fff;letter-spacing:1px;transition:.3s} /* Botón base */
+.user-modal-content button:hover,.user-modal-content .user-action:hover{background:#0a2342;color:#90caf9} /* Hover claro */
+body.active .user-modal-content button,body.active .user-modal-content .user-action{background:#223a5f;color:#eaf6ff} /* Botón oscuro */
+body.active .user-modal-content button:hover,body.active .user-modal-content .user-action:hover{background:#1565c0;color:#fff} /* Hover oscuro */
+
+/* === BOTÓN CERRAR === */
+.close-modal{position:absolute;top:18px;right:18px;width:40px;height:40px;font-size:2.2em;color:#1565c0;cursor:pointer;font-weight:bold;background:rgba(21,101,192,.09);border-radius:50%;border:none;outline:none;padding:0;line-height:1;display:flex;align-items:center;justify-content:center;transition:.3s;box-shadow:0 2px 8px rgba(21,101,192,.08)} /* Botón de cerrar */
+body.active .close-modal{color:#90caf9} /* Color oscuro */
+.close-modal:hover{background:#1565c0;color:#fff} /* Hover */
+

@@ -80,10 +80,24 @@ function logout() {
 }
 
 function status() {
-    if (isset($_SESSION['id_usuario']) && isset($_SESSION['nombre_usuario'])) {
+    if (isset($_SESSION['id_usuario'])) {
+        $nombre = '';
+        if (isset($_SESSION['nombre_usuario']) && trim($_SESSION['nombre_usuario']) !== '') {
+            $nombre = $_SESSION['nombre_usuario'];
+        } else {
+            // Si el nombre no está en sesión, lo buscamos en la base de datos
+            require_once __DIR__ . '/crud.php';
+            $usuarios = obtenerUsuarios();
+            foreach ($usuarios as $u) {
+                if ($u['id_usuario'] == $_SESSION['id_usuario']) {
+                    $nombre = $u['nombre'];
+                    break;
+                }
+            }
+        }
         echo json_encode([
             'logged' => true,
-            'nombre' => $_SESSION['nombre_usuario']
+            'nombre' => $nombre
         ]);
     } else {
         echo json_encode([
@@ -106,6 +120,54 @@ if ($action === 'login') {
     logout();
 } elseif ($action === 'status') {
     status();
+} elseif ($action === 'delete_account') {
+    delete_account();
+} elseif ($action === 'change_password') {
+    change_password();
 } else {
     echo json_encode(['success' => false, 'message' => 'Acción no válida.']);
+}
+// Eliminar cuenta del usuario autenticado
+function delete_account() {
+    if (!isset($_SESSION['id_usuario'])) {
+        echo json_encode(['success' => false, 'error' => 'No autenticado']);
+        return;
+    }
+    $id = $_SESSION['id_usuario'];
+    require_once __DIR__ . '/crud.php';
+    $res = eliminarUsuario($id);
+    $_SESSION = array();
+    session_destroy();
+    echo json_encode(['success' => $res]);
+}
+
+// Cambiar contraseña del usuario autenticado
+function change_password() {
+    if (!isset($_SESSION['id_usuario'])) {
+        echo json_encode(['success' => false, 'error' => 'No autenticado']);
+        return;
+    }
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!$data || empty($data['nueva_contrasena'])) {
+        echo json_encode(['success' => false, 'error' => 'Faltan datos']);
+        return;
+    }
+    $id = $_SESSION['id_usuario'];
+    $nueva = $data['nueva_contrasena'];
+    $hash = password_hash($nueva, PASSWORD_DEFAULT);
+    require_once __DIR__ . '/crud.php';
+    $usuarios = obtenerUsuarios();
+    $usuario = null;
+    foreach ($usuarios as $u) {
+        if ($u['id_usuario'] == $id) {
+            $usuario = $u;
+            break;
+        }
+    }
+    if (!$usuario) {
+        echo json_encode(['success' => false, 'error' => 'Usuario no encontrado']);
+        return;
+    }
+    $res = actualizarUsuario($id, $usuario['nombre'], $usuario['correo'], $hash, $usuario['id_rol']);
+    echo json_encode(['success' => $res]);
 }

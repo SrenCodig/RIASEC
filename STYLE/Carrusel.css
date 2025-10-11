@@ -1,0 +1,42 @@
+/* === SECCIÓN: CONTENEDOR PRINCIPAL DEL CARRUSEL === */
+.carrusel-container{position:relative;width:100%;max-width:900px;min-height:420px;margin:2.5em auto 2em;border-radius:24px;background:#fff;box-shadow:0 8px 32px rgba(21,101,192,.18);border:3px solid #e3eafc;padding:2.2em 0 3em;display:flex;align-items:center;justify-content:center} /* Contenedor carrusel */
+
+/* === SECCIÓN: WRAPPER Y TRANSFORMACIONES === */
+.carrusel{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);position:relative} /* Wrapper items */
+
+/* === SECCIÓN: ITEMS Y VISIBILIDAD === */
+.carrusel-item{flex:0 0 100%;display:none;justify-content:center;align-items:center;height:100%;animation:fadeIn .7s cubic-bezier(.4,0,.2,1)} /* Item oculto */
+.carrusel-item.active{display:flex} /* Item activo visible */
+
+/* === SECCIÓN: TARJETA INTERNA === */
+.carrusel-card{width:100%;max-width:760px;min-height:340px;background:#e3eafc;border-radius:24px;box-shadow:0 8px 32px rgba(21,101,192,.14);padding:3em 2.8em 2.5em;margin:0 auto;border:3px solid #1565c0;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;transition:box-shadow .4s,background .4s;position:relative} /* Tarjeta */
+.carrusel-fecha{position:absolute;top:24px;left:36px;font-size:1.12em;font-weight:700;color:#1565c0;background:#e3eafc;padding:.6em 1.5em;border-radius:99px;box-shadow:0 2px 8px rgba(21,101,192,.10);z-index:20;letter-spacing:.5px;border:2px solid #e3eafc;transition:background .3s,color .3s} /* Fecha */
+
+/* === SECCIÓN: TABLA INTERNA DEL CARRUSEL === */
+.carrusel-card .tabla-historial{margin:3.8em auto 2.2em;width:98%;border-radius:16px;font-size:1.22em;background:#fff;box-shadow:0 4px 18px rgba(21,101,192,.12);border:2px solid #e3eafc} /* Tabla interna */
+.carrusel-card th,.carrusel-card td{padding:1em 1.6em;text-align:center} /* Celdas tabla */
+.carrusel-card th{background:#1565c0;color:#fff;font-weight:700;font-size:1.18em;letter-spacing:.7px} /* Cabecera tabla */
+.carrusel-card td{background:#fff;color:#1565c0;font-weight:600;font-size:1.18em} /* Celdas valor */
+
+/* === SECCIÓN: CONTROLES (FLECHAS) === */
+.carrusel-prev,.carrusel-next{position:absolute;top:50%;background:rgba(21,101,192,.55);color:#fff;border:none;border-radius:50% !important;width:64px !important;height:64px !important;min-width:64px !important;min-height:64px !important;max-width:64px !important;max-height:64px !important;aspect-ratio:1/1 !important;font-size:2.2em !important;cursor:pointer;z-index:10;opacity:.85;backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;padding:0 !important;overflow:hidden;line-height:1 !important;text-align:center} /* Flechas */
+.carrusel-prev{left:0} .carrusel-next{right:0} /* Posicion flechas */
+
+/* === SECCIÓN: BADGES Y MARCADORES === */
+.carrusel-badge{position:absolute;top:24px;right:36px;background:#1565c0;color:#fff;font-size:1.12em;font-weight:700;padding:.6em 1.5em;border-radius:99px;box-shadow:0 2px 8px rgba(21,101,192,.14);letter-spacing:.5px;z-index:20;opacity:.93;transition:background .3s,color .3s} /* Badge */
+.carrusel-badge.badge-ultima{background:#43a047} /* Badge ultima */
+.carrusel-badge.badge-primera{background:#1976d2} /* Badge primera */
+
+/* === SECCIÓN: MODO OSCURO (PRESERVADO) === */
+body.active .carrusel-fecha{color:#90caf9;background:#16203a;border-color:#223a5f} /* Fecha oscuro */
+body.active .carrusel-badge{background:#223a5f;color:#90caf9} /* Badge oscuro base */
+body.active .carrusel-badge.badge-ultima{background:#43a047;color:#eaf6ff} /* Badge ultima oscuro */
+body.active .carrusel-badge.badge-primera{background:#1976d2;color:#eaf6ff} /* Badge primera oscuro */
+body.active .carrusel-container{background:#223a5f;border-color:#90caf9} /* Contenedor oscuro */
+body.active .carrusel-card{background:#16203a;border-color:#90caf9;color:#eaf6ff} /* Card oscuro */
+body.active .carrusel-card .tabla-historial{background:#223a5f;color:#eaf6ff;border-color:#90caf9} /* Tabla interna oscuro */
+body.active .carrusel-card th{background:#223a5f;color:#eaf6ff} /* Cabecera oscuro */
+body.active .carrusel-card td{background:#16203a;color:#90caf9} /* Celdas oscuro */
+
+/* === SECCIÓN: ANIMACIONES GLOBALES === */
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}} /* fadeIn */
