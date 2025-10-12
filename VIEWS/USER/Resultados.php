@@ -1,13 +1,18 @@
-<!-- PARTE PHP -->
-
-
 <?php
+/* ============================================================
+RESULTADOS DE LA PRUEBA RIASEC
+- Carga resultados, historial, descarga y detalle
+============================================================== */
+
 require_once __DIR__ . '/../../PHP/crud.php';
 session_start();
 
-$resultadosUsuario = [];
+/* ==== VARIABLES INICIALES ==== */
 $usuarioRegistrado = isset($_SESSION['id_usuario']);
+$resultadosUsuario = [];
 $resultadoActual = null;
+$mostrarDetalle = false;
+$detalleResultado = null;
 $explicaciones = [
     'R' => 'Realista: Prefieres actividades prácticas, trabajo físico y el uso de herramientas o maquinaria.',
     'I' => 'Investigador: Te atraen las actividades analíticas, científicas y el aprendizaje intelectual.',
@@ -17,6 +22,7 @@ $explicaciones = [
     'C' => 'Convencional: Te atraen las tareas organizativas, administrativas y el trabajo con datos.'
 ];
 
+/* ==== OBTENER RESULTADOS ==== */
 try {
     if ($usuarioRegistrado) {
         $id_usuario = $_SESSION['id_usuario'];
@@ -29,7 +35,7 @@ try {
         }
     } elseif (isset($_SESSION['respuestas_riasec'])) {
         $respuestas = $_SESSION['respuestas_riasec'];
-        $puntajes = array_fill_keys(['R','I','A','S','E','C'],0);
+        $puntajes = array_fill_keys(['R','I','A','S','E','C'], 0);
         foreach (obtenerPreguntas() as $p) {
             $pid = 'pregunta_' . $p['id_pregunta'];
             if (isset($respuestas[$pid])) $puntajes[$p['categoria']] += (int)$respuestas[$pid];
@@ -48,9 +54,8 @@ try {
     die('<h2 class="error">Error al cargar resultados: ' . htmlspecialchars($e->getMessage()) . '</h2>');
 }
 
-$mostrarDetalle = false;
-$detalleResultado = null;
-if (isset($_GET['id_resultado']) && $usuarioRegistrado) {
+/* ==== DETALLE DE RESULTADO ==== */
+if ($usuarioRegistrado && isset($_GET['id_resultado'])) {
     foreach ($resultadosUsuario as $res) {
         if ($res['id_resultado'] == $_GET['id_resultado']) {
             $detalleResultado = $res;
@@ -60,11 +65,18 @@ if (isset($_GET['id_resultado']) && $usuarioRegistrado) {
     }
 }
 
-// Procesar descarga de detalles antes de enviar HTML
+/* ==== DESCARGA DE DETALLES ==== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['descargar_detalles'])) {
-    // Determinar puntajes actuales
     $resultadoParaMostrar = $mostrarDetalle && $detalleResultado ? $detalleResultado : $resultadoActual;
     if ($resultadoParaMostrar) {
+        // Calcular perfil usuario en porcentaje
+        $letras = ['R','I','A','S','E','C'];
+        $preguntas = obtenerPreguntas();
+        $opciones = obtenerOpciones();
+        $maxValor = $opciones ? max(array_column($opciones,'valor')) : 0;
+        $numPreguntas = array_fill_keys($letras, 0);
+        foreach ($preguntas as $p) $numPreguntas[$p['categoria']]++;
+        $puntajeMax = array_map(fn($n)=>$n*$maxValor, $numPreguntas);
         $puntajes = [
             'R' => $resultadoParaMostrar['puntaje_R'],
             'I' => $resultadoParaMostrar['puntaje_I'],
@@ -73,17 +85,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['descargar_detalles'])
             'E' => $resultadoParaMostrar['puntaje_E'],
             'C' => $resultadoParaMostrar['puntaje_C']
         ];
-        $detalles = generarDetallesCarreras($puntajes);
+        $perfilUsuario = [];
+        foreach ($letras as $l) {
+            $perfilUsuario[$l] = $puntajeMax[$l] > 0 ? round($puntajes[$l] / $puntajeMax[$l] * 100) : 0;
+        }
+        // Calcular afinidad con cada carrera
+        $todasCarreras = obtenerCarreras();
+        $afinidades = [];
+        foreach ($todasCarreras as $carrera) {
+            $perfilCarrera = [];
+            foreach ($letras as $l) {
+                $perfilCarrera[$l] = isset($carrera['porcentaje_' . $l]) ? (int)$carrera['porcentaje_' . $l] : 0;
+            }
+            $distancia = 0;
+            foreach ($letras as $l) {
+                $distancia += abs($perfilUsuario[$l] - $perfilCarrera[$l]);
+            }
+            $afinidad = 100 - round($distancia / (count($letras)*100) * 100);
+            $afinidades[] = [
+                'nombre' => $carrera['nombre'],
+                'descripcion' => $carrera['descripcion'],
+                'perfil' => $perfilCarrera,
+                'afinidad' => $afinidad
+            ];
+        }
+        usort($afinidades, fn($a,$b)=>$b['afinidad'] <=> $a['afinidad']);
+        $detalles = "PERFIL DEL USUARIO (porcentaje por letra):\n";
+        foreach ($perfilUsuario as $letra => $porc) {
+            $detalles .= "$letra: $porc% ";
+        }
+        $detalles .= "\n\nLISTA COMPLETA DE CARRERAS (ordenadas por afinidad):\n";
+        foreach ($afinidades as $i => $carrera) {
+            $detalles .= ($i+1) . ". " . $carrera['nombre'] . "\n";
+            $detalles .= "   Afinidad: " . $carrera['afinidad'] . "%\n";
+            $detalles .= "   Perfil ideal: ";
+            foreach ($carrera['perfil'] as $letra => $porc) {
+                $detalles .= "$letra: $porc% ";
+            }
+            $detalles .= "\n   Descripción: " . $carrera['descripcion'] . "\n\n";
+        }
+        $detalles .= "Las 3 mejores carreras para ti son las que aparecen primero en la lista porque tienen la mayor afinidad con tu perfil vocacional, es decir, la menor diferencia entre tu perfil y el perfil ideal de la carrera.\n";
         header('Content-Type: text/plain');
-        header('Content-Disposition: attachment; filename="detalles.txt"');
+        header('Content-Disposition: attachment; filename=\"detalles.txt\"');
         echo $detalles;
         exit;
     }
 }
-
 ?>
-<!-- PARTE HTML -->
-
+<!-- ============================================================
+     PARTE HTML (todo el renderizado visual)
+     ============================================================ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -96,6 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['descargar_detalles'])
     <link rel="stylesheet" href="/RIASEC/STYLE/Carrusel.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
 </head>
+
 <body>
     <nav id="user-menu" class="user-menu-top"></nav>
     <header class="resultados-header">
@@ -107,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['descargar_detalles'])
         </div>
         <h1 class="titulo-principal">Resultados de tu Prueba</h1>
     </header>
+
     <main class="resultados-main">
         <?php if ($usuarioRegistrado): ?>
         <section class="historial-section">
@@ -114,51 +167,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['descargar_detalles'])
             <?php if (!$resultadosUsuario): ?>
                 <p class="info">No tienes pruebas guardadas.</p>
             <?php else: ?>
-                <div class="carrusel-container">
-                    <div class="carrusel" id="historial-carrusel">
-                        <?php foreach ($resultadosUsuario as $index => $res): ?>
-                        <div class="carrusel-item<?= $index === 0 ? ' active' : '' ?>">
-                            <div class="carrusel-card">
-                                <!-- Fecha en la esquina superior izquierda -->
-                                <span class="carrusel-fecha">Fecha: <?= htmlspecialchars($res['fecha']) ?></span>
-                                <!-- Badge en la esquina superior derecha -->
-                                <?php if ($index === 0): ?>
-                                    <span class="carrusel-badge badge-ultima">Última realizada</span>
-                                <?php elseif ($index === count($resultadosUsuario)-1): ?>
-                                    <span class="carrusel-badge badge-primera">Primera realizada</span>
-                                <?php endif; ?>
-                                <table class="tabla-historial" aria-label="Puntajes de la prueba">
-                                    <thead>
-                                        <tr>
-                                            <th>R</th><th>I</th><th>A</th><th>S</th><th>E</th><th>C</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><?= htmlspecialchars($res['puntaje_R']) ?></td>
-                                            <td><?= htmlspecialchars($res['puntaje_I']) ?></td>
-                                            <td><?= htmlspecialchars($res['puntaje_A']) ?></td>
-                                            <td><?= htmlspecialchars($res['puntaje_S']) ?></td>
-                                            <td><?= htmlspecialchars($res['puntaje_E']) ?></td>
-                                            <td><?= htmlspecialchars($res['puntaje_C']) ?></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <form method="get" class="detalle-form">
-                                    <input type="hidden" name="id_resultado" value="<?= $res['id_resultado'] ?>">
-                                    <button type="submit" class="btn-pag">Ver detalle</button>
-                                </form>
-                            </div>
+            <div class="carrusel-container">
+                <div class="carrusel" id="historial-carrusel">
+                    <?php foreach ($resultadosUsuario as $index => $res): ?>
+                    <div class="carrusel-item<?= $index === 0 ? ' active' : '' ?>">
+                        <div class="carrusel-card">
+                            <span class="carrusel-fecha">Fecha: <?= htmlspecialchars($res['fecha']) ?></span>
+                            <?php if ($index === 0): ?>
+                                <span class="carrusel-badge badge-ultima">Última realizada</span>
+                            <?php elseif ($index === count($resultadosUsuario)-1): ?>
+                                <span class="carrusel-badge badge-primera">Primera realizada</span>
+                            <?php endif; ?>
+                            <table class="tabla-historial" aria-label="Puntajes de la prueba">
+                                <thead><tr><th>R</th><th>I</th><th>A</th><th>S</th><th>E</th><th>C</th></tr></thead>
+                                <tbody>
+                                    <tr>
+                                        <td><?= htmlspecialchars($res['puntaje_R']) ?></td>
+                                        <td><?= htmlspecialchars($res['puntaje_I']) ?></td>
+                                        <td><?= htmlspecialchars($res['puntaje_A']) ?></td>
+                                        <td><?= htmlspecialchars($res['puntaje_S']) ?></td>
+                                        <td><?= htmlspecialchars($res['puntaje_E']) ?></td>
+                                        <td><?= htmlspecialchars($res['puntaje_C']) ?></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <form method="get" class="detalle-form">
+                                <input type="hidden" name="id_resultado" value="<?= htmlspecialchars($res['id_resultado']) ?>">
+                                <button type="submit" class="btn-pag">Ver detalle</button>
+                            </form>
                         </div>
-                        <?php endforeach; ?>
                     </div>
-                    <button class="carrusel-prev" aria-label="Anterior">&#10094;</button>
-                    <button class="carrusel-next" aria-label="Siguiente">&#10095;</button>
+                    <?php endforeach; ?>
                 </div>
+                <button class="carrusel-prev" aria-label="Anterior">&#10094;</button>
+                <button class="carrusel-next" aria-label="Siguiente">&#10095;</button>
+            </div>
             <?php endif; ?>
         </section>
         <hr>
-        <h2 class="subtitulo">Resultado de tu prueba más reciente</h2>
+        <?php
+        if ($mostrarDetalle && $detalleResultado) {
+            echo '<h2 class="subtitulo">Estás viendo una prueba pasada</h2>';
+        } else {
+            echo '<h2 class="subtitulo">Resultado de tu prueba más reciente</h2>';
+        }
+        ?>
         <?php else: ?>
         <h2 class="subtitulo">Resultado de tu prueba</h2>
         <?php endif; ?>
@@ -166,6 +219,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['descargar_detalles'])
         <?php
         $resultadoParaMostrar = $mostrarDetalle && $detalleResultado ? $detalleResultado : $resultadoActual;
         if ($resultadoParaMostrar):
+            // 1. Calcular puntajes máximos por letra
+            $letras = ['R','I','A','S','E','C'];
+            $preguntas = obtenerPreguntas();
+            $opciones = obtenerOpciones();
+            $maxValor = $opciones ? max(array_column($opciones,'valor')) : 0;
+            $numPreguntas = array_fill_keys($letras, 0);
+            foreach ($preguntas as $p) $numPreguntas[$p['categoria']]++;
+            $puntajeMax = array_map(fn($n)=>$n*$maxValor, $numPreguntas);
+
+            // 2. Calcular perfil usuario en porcentaje
             $puntajes = [
                 'R' => $resultadoParaMostrar['puntaje_R'],
                 'I' => $resultadoParaMostrar['puntaje_I'],
@@ -174,101 +237,116 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['descargar_detalles'])
                 'E' => $resultadoParaMostrar['puntaje_E'],
                 'C' => $resultadoParaMostrar['puntaje_C']
             ];
-            arsort($puntajes);
-            $dominantes = array_slice(array_keys($puntajes), 0, 3);
-            $perfil = "Tu perfil vocacional dominante es: <strong>" . implode(", ", $dominantes) . "</strong>.<br>";
-            $perfil .= "Esto significa que tienes una combinación de intereses y habilidades en los siguientes ámbitos:<ul>";
-            foreach ($dominantes as $letra) {
-                $perfil .= "<li><strong>$letra</strong>: " . $explicaciones[$letra] . "</li>";
+            $perfilUsuario = [];
+            foreach ($letras as $l) {
+                $perfilUsuario[$l] = $puntajeMax[$l] > 0 ? round($puntajes[$l] / $puntajeMax[$l] * 100) : 0;
             }
-            $perfil .= "</ul>Personas con este perfil suelen destacar en áreas donde se combinan estas características. Te recomendamos explorar carreras y ocupaciones que integren estos intereses para potenciar tu desarrollo profesional y personal.";
+            arsort($perfilUsuario);
+            $dominantes = array_slice(array_keys($perfilUsuario), 0, 3);
 
-                // Obtener las 3 mejores carreras recomendadas
-                $carrerasRecomendadas = obtenerCarrerasRecomendadas([
-                    'R' => $puntajes['R'],
-                    'I' => $puntajes['I'],
-                    'A' => $puntajes['A'],
-                    'S' => $puntajes['S'],
-                    'E' => $puntajes['E'],
-                    'C' => $puntajes['C']
-                ]);
-                // Obtener descripciones completas de las carreras
-                $carrerasFull = [];
-                foreach (obtenerCarreras() as $carrera) {
-                    foreach ($carrerasRecomendadas as $rec) {
-                        if ($carrera['nombre'] === $rec['nombre']) {
-                            $carrerasFull[] = $carrera;
-                        }
-                    }
+            // 3. Calcular afinidad con cada carrera
+            $todasCarreras = obtenerCarreras();
+            $afinidades = [];
+            foreach ($todasCarreras as $carrera) {
+                $perfilCarrera = [];
+                foreach ($letras as $l) {
+                    $perfilCarrera[$l] = isset($carrera['porcentaje_' . $l]) ? (int)$carrera['porcentaje_' . $l] : 0;
                 }
+                // Distancia absoluta
+                $distancia = 0;
+                foreach ($letras as $l) {
+                    $distancia += abs($perfilUsuario[$l] - $perfilCarrera[$l]);
+                }
+                // Afinidad: 100 - (distancia total / (6*100))*100
+                $afinidad = 100 - round($distancia / (count($letras)*100) * 100);
+                $afinidades[] = [
+                    'nombre' => $carrera['nombre'],
+                    'descripcion' => $carrera['descripcion'],
+                    'perfil' => $perfilCarrera,
+                    'afinidad' => $afinidad
+                ];
+            }
+            // Ordenar por mayor afinidad
+            usort($afinidades, fn($a,$b)=>$b['afinidad'] <=> $a['afinidad']);
+            $carrerasRecomendadas = array_slice($afinidades, 0, 3);
+
+            // 4. Perfil narrativo
+            $perfil = "Tu perfil vocacional dominante es: <strong>" . implode(", ", $dominantes) . "</strong>.<br>Esto significa que tienes una combinación de intereses y habilidades en los siguientes ámbitos:<ul>";
+            foreach ($dominantes as $letra) $perfil .= "<li><strong>$letra</strong>: {$explicaciones[$letra]}</li>";
+            $perfil .= "</ul>Personas con este perfil suelen destacar en áreas donde se combinan estas características. Te recomendamos explorar carreras y ocupaciones que integren estos intereses.";
         ?>
         <section class="resultado-section">
             <article class="puntajes-article">
-                <h3 class="subtitulo">Puntajes totales de esta prueba (ordenados):</h3>
+                <h3 class="subtitulo">Puntajes totales (ordenados):</h3>
                 <ul class="puntajes-lista">
                     <?php foreach ($puntajes as $letra => $valor): ?>
-                        <li class="puntaje-item">
-                            <span class="puntaje-circulo">
-                                <span class="puntaje-letra"><?= $letra ?></span>
-                                <span class="puntaje-numero"><?= $valor ?></span>
-                            </span>
-                            <span class="explicacion"><?= $explicaciones[$letra] ?></span>
-                        </li>
+                    <li class="puntaje-item">
+                        <span class="puntaje-circulo">
+                            <span class="puntaje-letra"><?= $letra ?></span>
+                            <span class="puntaje-numero"><?= $valor ?></span>
+                        </span>
+                        <span class="explicacion"><?= $explicaciones[$letra] ?></span>
+                    </li>
                     <?php endforeach; ?>
                 </ul>
             </article>
+
             <article class="dominantes-article">
                 <h3 class="subtitulo">Tus 3 letras dominantes:</h3>
                 <ul class="dominantes-lista">
                     <?php foreach ($dominantes as $letra): ?>
-                        <li class="dominante-item">
-                            <span class="letra-dominante"><span class="letra-dominante-texto" style="width:100%;text-align:center;"><?= $letra ?></span></span>
-                            <span class="explicacion-dominante"><?= $explicaciones[$letra] ?></span>
-                        </li>
+                    <li class="dominante-item">
+                        <span class="letra-dominante"><span class="letra-dominante-texto"><?= $letra ?></span></span>
+                        <span class="explicacion-dominante"><?= $explicaciones[$letra] ?></span>
+                    </li>
                     <?php endforeach; ?>
                 </ul>
-                    <h3 class="subtitulo">Tus 3 mejores carreras recomendadas:</h3>
-                    <ul class="carreras-nombres-lista">
-                        <?php foreach ($carrerasRecomendadas as $carrera): ?>
-                            <li class="carrera-nombre-item"><span class="carrera-nombre-texto"><?= htmlspecialchars($carrera['nombre']) ?></span></li>
-                        <?php endforeach; ?>
-                        <!-- Botón para descargar detalles de carreras recomendadas -->
-                        <li style="list-style:none;margin-top:1em;text-align:center;">
-                            <form method="post" action="" style="display:inline;">
-                                <input type="hidden" name="descargar_detalles" value="1">
-                                <button type="submit" class="btn-pag">Ver detalles</button>
-                            </form>
-                        </li>
-                    </ul>
+
+                <h3 class="subtitulo">Tus 3 mejores carreras recomendadas:</h3>
+                <ul class="carreras-nombres-lista">
+                    <?php foreach ($carrerasRecomendadas as $carrera): ?>
+                    <li class="carrera-nombre-item">
+                        <span class="carrera-nombre-texto"><?= htmlspecialchars($carrera['nombre']) ?></span>
+                    </li>
+                    <?php endforeach; ?>
+                    <li style="list-style:none;margin-top:1em;text-align:center;">
+                        <form method="post" action="">
+                            <input type="hidden" name="descargar_detalles" value="1">
+                            <button type="submit" class="btn-pag">Ver detalles</button>
+                        </form>
+                    </li>
+                </ul>
             </article>
+
             <article class="perfil-article">
-                    <h3 class="subtitulo">Perfil narrativo:</h3>
-                    <div class="perfil-narrativo perfil-narrativo-simple">
-                        <div class="perfil-narrativo-texto">
-                            <?= $perfil ?>
-                        </div>
-                        <section class="carreras-descripcion-section perfil-narrativo-carreras">
-                            <h4 class="carreras-descripcion-titulo">Tus 3 carreras recomendadas y sus descripciones:</h4>
-                            <ul class="carreras-descripcion-lista">
-                                <?php foreach ($carrerasFull as $carrera): ?>
-                                    <li class="carrera-descripcion-item">
-                                        <strong class="carrera-descripcion-nombre"><?= htmlspecialchars($carrera['nombre']) ?>:</strong> <span class="carrera-descripcion-texto"><?= htmlspecialchars($carrera['descripcion']) ?></span>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </section>
-                    </div>
+                <h3 class="subtitulo">Perfil narrativo:</h3>
+                <div class="perfil-narrativo perfil-narrativo-simple">
+                    <div class="perfil-narrativo-texto"><?= $perfil ?></div>
+                    <section class="carreras-descripcion-section perfil-narrativo-carreras">
+                        <h4 class="carreras-descripcion-titulo">Tus 3 carreras recomendadas y sus descripciones:</h4>
+                        <ul class="carreras-descripcion-lista">
+                            <?php foreach ($carrerasRecomendadas as $carrera): ?>
+                            <li class="carrera-descripcion-item">
+                                <strong class="carrera-descripcion-nombre"><?= htmlspecialchars($carrera['nombre']) ?>:</strong>
+                                <span class="carrera-descripcion-texto"> <?= htmlspecialchars($carrera['descripcion']) ?></span>
+                            </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </section>
+                </div>
             </article>
         </section>
         <?php else: ?>
             <p class="info">No se recibieron respuestas.</p>
         <?php endif; ?>
+
         <footer class="resultados-footer">
             <form action="../../index.php" method="get" class="volver-form">
                 <button type="submit" class="btn-pag">Volver al inicio</button>
             </form>
         </footer>
     </main>
+
     <script src="/RIASEC/JAVASCRIPT/Recursos.js"></script>
 </body>
 </html>

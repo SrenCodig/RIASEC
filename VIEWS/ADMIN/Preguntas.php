@@ -62,7 +62,7 @@ $editando = false;
 $preguntaEdit = null;
 if (isset($_GET['editar'])) {
     $idEdit = (int)$_GET['editar'];
-    foreach ($preguntas as $p) {
+    foreach ($todasPreguntas as $p) {
         if ($p['id_pregunta'] == $idEdit) {
             $editando = true;
             $preguntaEdit = $p;
@@ -121,6 +121,7 @@ if (isset($_GET['editar'])) {
                                     <form method="get" style="display:inline;">
                                         <input type="hidden" name="categoria" value="<?= $catActual ?>">
                                         <input type="hidden" name="editar" value="<?= $p['id_pregunta'] ?>">
+                                        <input type="hidden" name="pag" value="<?= $paginaActual ?>">
                                         <button type="submit" class="btn-accion" title="Editar" style="min-width:40px;max-width:40px;padding:.5em .5em;display:flex;align-items:center;justify-content:center;">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M4 20h4.586a2 2 0 0 0 1.414-.586l9-9a2 2 0 0 0 0-2.828l-2.586-2.586a2 2 0 0 0-2.828 0l-9 9A2 2 0 0 0 4 15.414V20z"/><path stroke="currentColor" stroke-width="2" d="M14.5 7.5l2 2"/></svg>
                                         </button>
@@ -128,6 +129,7 @@ if (isset($_GET['editar'])) {
                                     <form method="get" style="display:inline;" onsubmit="return confirm('¿Seguro que desea eliminar esta pregunta?');">
                                         <input type="hidden" name="categoria" value="<?= $catActual ?>">
                                         <input type="hidden" name="eliminar" value="<?= $p['id_pregunta'] ?>">
+                                        <input type="hidden" name="pag" value="<?= $paginaActual ?>">
                                         <button type="submit" class="btn-accion" title="Eliminar" style="min-width:40px;max-width:40px;padding:.5em .5em;display:flex;align-items:center;justify-content:center;">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M6 7h12M9 7V5a3 3 0 0 1 6 0v2m-9 0v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V7"/></svg>
                                         </button>
@@ -142,9 +144,40 @@ if (isset($_GET['editar'])) {
             $totalPaginas = ceil($totalPreguntas / $preguntasPorPagina);
             if ($totalPaginas > 1): ?>
             <div style="display:flex;justify-content:center;gap:.5em;margin:2em 0;">
-                <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
-                    <a href="?categoria=<?= $catActual ?>&pag=<?= $i ?>" class="btn-accion" style="min-width:36px;max-width:36px;padding:.4em .4em;<?= $paginaActual == $i ? 'background:#0a2342;color:#fff;' : '' ?>"> <?= $i ?> </a>
-                <?php endfor; ?>
+                <?php
+                $maxBotones = 3;
+                $inicio = max(1, $paginaActual - 1);
+                $fin = min($totalPaginas, $inicio + $maxBotones - 1);
+                if ($totalPaginas > 10) {
+                    // [<<] [<]
+                    if ($paginaActual > 1) {
+                        echo '<form method="get" style="display:inline;"><input type="hidden" name="categoria" value="' . $catActual . '"><input type="hidden" name="pag" value="1"><button type="submit" class="btn-accion" title="Primera página">&lt;&lt;</button></form> ';
+                        echo '<form method="get" style="display:inline;"><input type="hidden" name="categoria" value="' . $catActual . '"><input type="hidden" name="pag" value="' . ($paginaActual - 1) . '"><button type="submit" class="btn-accion" title="Anterior">&lt;</button></form> ';
+                    }
+                    // [n] [n+1] [n+2]
+                    for ($i = $inicio; $i <= $fin; $i++) {
+                        if ($i == $paginaActual) {
+                            echo '<button class="btn-accion" style="background:#0a2342;color:#fff;" disabled>' . $i . '</button> ';
+                        } else {
+                            echo '<form method="get" style="display:inline;"><input type="hidden" name="categoria" value="' . $catActual . '"><input type="hidden" name="pag" value="' . $i . '"><button type="submit" class="btn-accion">' . $i . '</button></form> ';
+                        }
+                    }
+                    // [>] [>>]
+                    if ($paginaActual < $totalPaginas) {
+                        echo '<form method="get" style="display:inline;"><input type="hidden" name="categoria" value="' . $catActual . '"><input type="hidden" name="pag" value="' . ($paginaActual + 1) . '"><button type="submit" class="btn-accion" title="Siguiente">&gt;</button></form> ';
+                        echo '<form method="get" style="display:inline;"><input type="hidden" name="categoria" value="' . $catActual . '"><input type="hidden" name="pag" value="' . $totalPaginas . '"><button type="submit" class="btn-accion" title="Última página">&gt;&gt;</button></form> ';
+                    }
+                } else {
+                    // Paginación simple
+                    for ($i = 1; $i <= $totalPaginas; $i++) {
+                        if ($i == $paginaActual) {
+                            echo '<button class="btn-accion" style="background:#0a2342;color:#fff;" disabled>' . $i . '</button> ';
+                        } else {
+                            echo '<form method="get" style="display:inline;"><input type="hidden" name="categoria" value="' . $catActual . '"><input type="hidden" name="pag" value="' . $i . '"><button type="submit" class="btn-accion">' . $i . '</button></form> ';
+                        }
+                    }
+                }
+                ?>
             </div>
             <?php endif; ?>
             <form action="Opciones.php" method="get" style="margin-top:2em; text-align:center;">

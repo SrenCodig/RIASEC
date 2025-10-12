@@ -48,17 +48,22 @@ CREATE TABLE resultados (
 );
 
 -- Tabla: carreras
-CREATE TABLE carreras (
-    id_carrera INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(100) NOT NULL,
-    puntaje_R INT,
-    puntaje_I INT,
-    puntaje_A INT,
-    puntaje_S INT,
-    puntaje_E INT,
-    puntaje_C INT,
-    descripcion TEXT
-);
+CREATE TABLE `carreras` (
+	`id_carrera` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_uca1400_ai_ci',
+	`porcentaje_R` TINYINT(4) NULL DEFAULT NULL,
+	`porcentaje_I` TINYINT(4) NULL DEFAULT NULL,
+	`porcentaje_A` TINYINT(4) NULL DEFAULT NULL,
+	`porcentaje_S` TINYINT(4) NULL DEFAULT NULL,
+	`porcentaje_E` TINYINT(4) NULL DEFAULT NULL,
+	`porcentaje_C` TINYINT(4) NULL DEFAULT NULL,
+	`descripcion` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_uca1400_ai_ci',
+	PRIMARY KEY (`id_carrera`) USING BTREE
+)
+COLLATE='utf8mb4_uca1400_ai_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=101
+;
 
 -- Datos iniciales
 INSERT INTO roles (nombre) VALUES ('Administrador'), ('Usuario');

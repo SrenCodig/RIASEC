@@ -85,7 +85,7 @@ if ($busqueda !== '') {
     $usuarios = array_filter($usuarios, function ($u) use ($busqueda) {
         $b = mb_strtolower($busqueda);
         return mb_strpos(mb_strtolower($u['nombre']), $b) !== false ||
-               mb_strpos(mb_strtolower($u['correo']), $b) !== false;
+            mb_strpos(mb_strtolower($u['correo']), $b) !== false;
     });
 }
 
@@ -213,11 +213,42 @@ $totalPaginas = ceil($totalUsuarios / $usuariosPorPagina);
         </div>
 
         <!-- PAGINACIÓN -->
-        <?php if ($totalUsuarios > $usuariosPorPagina): ?>
-            <div class="paginacion-categorias" style="margin:2em 0;justify-content:center;">
-                <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
-                    <a href="Usuarios.php?pag=<?= $i ?><?= $busqueda ? '&busqueda='.urlencode($busqueda) : '' ?>" class="btn-pag" style="<?= $i == $paginaActual ? 'background:#0a2342;color:#fff;' : '' ?>">Página <?= $i ?></a>
-                <?php endfor; ?>
+        <?php if ($totalPaginas > 1): ?>
+            <div style="margin:2em 0;text-align:center;">
+                <?php
+                $maxBotones = 3;
+                $inicio = max(1, $paginaActual - 1);
+                $fin = min($totalPaginas, $inicio + $maxBotones - 1);
+                if ($totalPaginas > 10) {
+                    // [<<] [<]
+                    if ($paginaActual > 1) {
+                        echo "<a href='Usuarios.php?pag=1" . ($busqueda ? "&busqueda=" . urlencode($busqueda) : "") . "' class='btn-pag' title='Primera página'>&lt;&lt;</a> ";
+                        echo "<a href='Usuarios.php?pag=" . ($paginaActual - 1) . ($busqueda ? "&busqueda=" . urlencode($busqueda) : "") . "' class='btn-pag' title='Anterior'>&lt;</a> ";
+                    }
+                    // [n] [n+1] [n+2]
+                    for ($i = $inicio; $i <= $fin; $i++) {
+                        if ($i == $paginaActual) {
+                            echo "<a href='#' class='btn-pag' style='background:#0a2342;color:#fff;' disabled>$i</a> ";
+                        } else {
+                            echo "<a href='Usuarios.php?pag=$i" . ($busqueda ? "&busqueda=" . urlencode($busqueda) : "") . "' class='btn-pag'>$i</a> ";
+                        }
+                    }
+                    // [>] [>>]
+                    if ($paginaActual < $totalPaginas) {
+                        echo "<a href='Usuarios.php?pag=" . ($paginaActual + 1) . ($busqueda ? "&busqueda=" . urlencode($busqueda) : "") . "' class='btn-pag' title='Siguiente'>&gt;</a> ";
+                        echo "<a href='Usuarios.php?pag=$totalPaginas" . ($busqueda ? "&busqueda=" . urlencode($busqueda) : "") . "' class='btn-pag' title='Última página'>&gt;&gt;</a> ";
+                    }
+                } else {
+                    // Paginación simple
+                    for ($i = 1; $i <= $totalPaginas; $i++) {
+                        if ($i == $paginaActual) {
+                            echo "<a href='#' class='btn-pag' style='background:#0a2342;color:#fff;' disabled>$i</a> ";
+                        } else {
+                            echo "<a href='Usuarios.php?pag=$i" . ($busqueda ? "&busqueda=" . urlencode($busqueda) : "") . "' class='btn-pag'>$i</a> ";
+                        }
+                    }
+                }
+                ?>
             </div>
         <?php endif; ?>
     </main>

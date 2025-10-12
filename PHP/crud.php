@@ -325,19 +325,19 @@ function eliminarResultado($id) {
 /**
  * Crea una nueva carrera.
  * @param string $nombre
- * @param int|null $r
- * @param int|null $i
- * @param int|null $a
- * @param int|null $s
- * @param int|null $e
- * @param int|null $c
+ * @param int|null $porcentajeR
+ * @param int|null $porcentajeI
+ * @param int|null $porcentajeA
+ * @param int|null $porcentajeS
+ * @param int|null $porcentajeE
+ * @param int|null $porcentajeC
  * @param string $descripcion
  * @return bool TRUE si se creó, FALSE si hubo error
  */
-function crearCarrera($nombre, $r, $i, $a, $s, $e, $c, $descripcion) {
+function crearCarrera($nombre, $porcentajeR, $porcentajeI, $porcentajeA, $porcentajeS, $porcentajeE, $porcentajeC, $descripcion) {
 	$conn = conectar();
-	$stmt = $conn->prepare('INSERT INTO carreras (nombre, puntaje_R, puntaje_I, puntaje_A, puntaje_S, puntaje_E, puntaje_C, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-	$stmt->bind_param('siiiiiis', $nombre, $r, $i, $a, $s, $e, $c, $descripcion);
+	$stmt = $conn->prepare('INSERT INTO carreras (nombre, porcentaje_R, porcentaje_I, porcentaje_A, porcentaje_S, porcentaje_E, porcentaje_C, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+	$stmt->bind_param('siiiiiis', $nombre, $porcentajeR, $porcentajeI, $porcentajeA, $porcentajeS, $porcentajeE, $porcentajeC, $descripcion);
 	$res = $stmt->execute();
 	$stmt->close(); $conn->close();
 	return $res;
@@ -368,10 +368,10 @@ function obtenerCarreras() {
  * @param string $descripcion
  * @return bool TRUE si se actualizó, FALSE si hubo error
  */
-function actualizarCarrera($id, $nombre, $r, $i, $a, $s, $e, $c, $descripcion) {
+function actualizarCarrera($nombre, $r, $i, $a, $s, $e, $c, $descripcion, $id) {
 	$conn = conectar();
-	$stmt = $conn->prepare('UPDATE carreras SET nombre=?, puntaje_R=?, puntaje_I=?, puntaje_A=?, puntaje_S=?, puntaje_E=?, puntaje_C=?, descripcion=? WHERE id_carrera=?');
-	$stmt->bind_param('siiiiisii', $nombre, $r, $i, $a, $s, $e, $c, $descripcion, $id);
+	$stmt = $conn->prepare('UPDATE carreras SET nombre=?, porcentaje_R=?, porcentaje_I=?, porcentaje_A=?, porcentaje_S=?, porcentaje_E=?, porcentaje_C=?, descripcion=? WHERE id_carrera=?');
+	$stmt->bind_param('siiiiiisi', $nombre, $r, $i, $a, $s, $e, $c, $descripcion, $id);
 	$res = $stmt->execute();
 	$stmt->close(); $conn->close();
 	return $res;
@@ -393,22 +393,22 @@ function eliminarCarrera($id) {
 
 
 function obtenerCarrerasRecomendadas($puntajesUsuario) {
-    $carreras = obtenerCarreras(); // Debes crear esta función en crud.php
-    $recomendadas = [];
-    foreach ($carreras as $carrera) {
-        // Calcula la diferencia total entre el perfil y el usuario
-        $diferencia = abs($puntajesUsuario['R'] - $carrera['puntaje_R'])
-                    + abs($puntajesUsuario['I'] - $carrera['puntaje_I'])
-                    + abs($puntajesUsuario['A'] - $carrera['puntaje_A'])
-                    + abs($puntajesUsuario['S'] - $carrera['puntaje_S'])
-                    + abs($puntajesUsuario['E'] - $carrera['puntaje_E'])
-                    + abs($puntajesUsuario['C'] - $carrera['puntaje_C']);
-        $recomendadas[] = ['nombre' => $carrera['nombre'], 'diferencia' => $diferencia];
-    }
-    // Ordena por menor diferencia
-    usort($recomendadas, fn($a, $b) => $a['diferencia'] <=> $b['diferencia']);
-    // Devuelve las 3 mejores
-    return array_slice($recomendadas, 0, 3);
+	$carreras = obtenerCarreras();
+	$recomendadas = [];
+	foreach ($carreras as $carrera) {
+		// Calcula la diferencia total entre el perfil y el usuario (porcentajes)
+		$diferencia = abs($puntajesUsuario['R'] - $carrera['porcentaje_R'])
+					+ abs($puntajesUsuario['I'] - $carrera['porcentaje_I'])
+					+ abs($puntajesUsuario['A'] - $carrera['porcentaje_A'])
+					+ abs($puntajesUsuario['S'] - $carrera['porcentaje_S'])
+					+ abs($puntajesUsuario['E'] - $carrera['porcentaje_E'])
+					+ abs($puntajesUsuario['C'] - $carrera['porcentaje_C']);
+		$recomendadas[] = ['nombre' => $carrera['nombre'], 'diferencia' => $diferencia];
+	}
+	// Ordena por menor diferencia
+	usort($recomendadas, fn($a, $b) => $a['diferencia'] <=> $b['diferencia']);
+	// Devuelve las 3 mejores
+	return array_slice($recomendadas, 0, 3);
 }
 
 /**
@@ -422,12 +422,12 @@ function generarDetallesCarreras($puntajesUsuario) {
 	$detalles = "CARRERAS RECOMENDADAS\n\n";
 	$recomendadas = [];
 	foreach ($carreras as $carrera) {
-		$diferencia = abs($puntajesUsuario['R'] - $carrera['puntaje_R'])
-					+ abs($puntajesUsuario['I'] - $carrera['puntaje_I'])
-					+ abs($puntajesUsuario['A'] - $carrera['puntaje_A'])
-					+ abs($puntajesUsuario['S'] - $carrera['puntaje_S'])
-					+ abs($puntajesUsuario['E'] - $carrera['puntaje_E'])
-					+ abs($puntajesUsuario['C'] - $carrera['puntaje_C']);
+		$diferencia = abs($puntajesUsuario['R'] - $carrera['porcentaje_R'])
+					+ abs($puntajesUsuario['I'] - $carrera['porcentaje_I'])
+					+ abs($puntajesUsuario['A'] - $carrera['porcentaje_A'])
+					+ abs($puntajesUsuario['S'] - $carrera['porcentaje_S'])
+					+ abs($puntajesUsuario['E'] - $carrera['porcentaje_E'])
+					+ abs($puntajesUsuario['C'] - $carrera['porcentaje_C']);
 		$recomendadas[] = [
 			'nombre' => $carrera['nombre'],
 			'descripcion' => $carrera['descripcion'],
