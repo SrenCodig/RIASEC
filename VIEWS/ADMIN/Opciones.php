@@ -33,6 +33,9 @@ if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['id_rol']) || $_SESSION[
     <main>
         <h1>Menú de Opciones (Admin)</h1>
         <div class="opciones-admin-menu">
+            <form action="Carreras.php" method="get" class="opcion-form">
+                <button type="submit" class="opcion-btn">Gestionar Carreras</button>
+            </form>
             <form action="Preguntas.php" method="get" class="opcion-form">
                 <button type="submit" class="opcion-btn">Gestionar Preguntas</button>
             </form>

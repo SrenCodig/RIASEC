@@ -150,6 +150,11 @@ if (isset($_GET['editar'])) {
     <nav id="user-menu" class="user-menu-top"></nav>
     <main>
         <h1>Gestión de Carreras</h1>
+        <div style="margin-bottom:1.5em;">
+            <form action="Opciones.php" method="get" style="display:inline;">
+                <button type="submit" class="opcion-btn" style="padding:.7em 2em;font-size:1.1em;">&larr; Volver a Opciones</button>
+            </form>
+        </div>
         <?php if ($msg): ?>
             <div class="msg-status"> <?= htmlspecialchars($msg) ?> </div>
         <?php endif; ?>
