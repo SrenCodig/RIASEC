@@ -1,14 +1,21 @@
 
 <?php
+// Archivo de utilidad para operaciones CRUD contra la base de datos.
+// Aquí se definen funciones reutilizables para roles, usuarios, preguntas, opciones, resultados y carreras.
+
 require_once __DIR__ . '/config.php';
 
+// Conexión a la base de datos usando MySQLi. Reutiliza las credenciales en config.php
 function conectar() {
 	global $host, $user, $pass, $db;
+	// Crear instancia de MySQLi
 	$conn = new mysqli($host, $user, $pass, $db);
+	// Si hay error en la conexión, registrar y lanzar excepción para que el llamador maneje
 	if ($conn->connect_error) {
 		error_log('Error de conexión: ' . $conn->connect_error);
 		throw new Exception('No se pudo conectar a la base de datos.');
 	}
+	// Asegurar codificación UTF-8 para evitar problemas con acentos
 	$conn->set_charset('utf8');
 	return $conn;
 }
@@ -21,10 +28,13 @@ function conectar() {
  * @return bool TRUE si se creó correctamente, FALSE si hubo error
  */
 function crearRol($nombre) {
+	// Abrir conexión
 	$conn = conectar();
+	// Prepared statement para prevenir inyección SQL
 	$stmt = $conn->prepare('INSERT INTO roles (nombre) VALUES (?)');
 	$stmt->bind_param('s', $nombre);
 	$res = $stmt->execute();
+	// Cerrar recursos
 	$stmt->close(); $conn->close();
 	return $res;
 }
@@ -34,6 +44,7 @@ function crearRol($nombre) {
  * @return array Lista de roles
  */
 function obtenerRoles() {
+	// Devuelve todos los roles como array asociativo
 	$conn = conectar();
 	$res = $conn->query('SELECT * FROM roles');
 	$roles = $res->fetch_all(MYSQLI_ASSOC);
@@ -48,6 +59,7 @@ function obtenerRoles() {
  * @return bool TRUE si se actualizó, FALSE si hubo error
  */
 function actualizarRol($id, $nombre) {
+	// Actualiza el nombre de un rol por su ID
 	$conn = conectar();
 	$stmt = $conn->prepare('UPDATE roles SET nombre=? WHERE id_rol=?');
 	$stmt->bind_param('si', $nombre, $id);
@@ -62,6 +74,7 @@ function actualizarRol($id, $nombre) {
  * @return bool TRUE si se eliminó, FALSE si hubo error
  */
 function eliminarRol($id) {
+	// Elimina un rol por su ID
 	$conn = conectar();
 	$stmt = $conn->prepare('DELETE FROM roles WHERE id_rol=?');
 	$stmt->bind_param('i', $id);

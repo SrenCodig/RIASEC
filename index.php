@@ -1,114 +1,5 @@
 <?php
-require_once __DIR__ . '/PHP/crud.php';
-session_start();
-
-// Obtener preguntas y opciones desde la base de datos
-$preguntas = [];
-$opciones = [];
-try {
-    $preguntas = obtenerPreguntas();
-    $opciones = obtenerOpciones();
-} catch (Exception $e) {
-    die('<h2>Error al cargar preguntas u opciones: ' . htmlspecialchars($e->getMessage()) . '</h2>');
-}
-
-// --- Lógica de navegación y validación de respuestas ---
-$totalPreguntas = count($preguntas);
-$preguntaActual = isset($_GET['q']) ? max(0, min($totalPreguntas-1, (int)$_GET['q'])) : 0;
-if (!isset($_SESSION['respuestas_riasec'])) $_SESSION['respuestas_riasec'] = [];
-
-$mensajeError = '';
-$panelAdmin = '';
-$verHistorial = '';
-
-// Botón de opciones admin (izquierda)
-if (isset($_SESSION['id_usuario']) && isset($_SESSION['id_rol']) && $_SESSION['id_rol'] == 1) {
-    $panelAdmin = '<form action="VIEWS/ADMIN/Opciones.php" method="get" style="margin:0;">'
-        . '<button type="submit">Panel de Administración</button>'
-        . '</form>';
-}
-
-// Botón ver pruebas pasadas (derecha)
-if (isset($_SESSION['id_usuario'])) {
-    try {
-        $id_usuario = $_SESSION['id_usuario'];
-        $tienePruebas = false;
-        $todosResultados = obtenerResultados();
-        foreach ($todosResultados as $res) {
-            if ($res['id_usuario'] == $id_usuario) {
-                $tienePruebas = true;
-                break;
-            }
-        }
-        if ($tienePruebas) {
-            $verHistorial = '<form action="VIEWS/USER/Resultados.php" method="get" style="margin:0;">'
-                . '<button type="submit" name="ver_historial" value="1">Ver resultados anteriores</button>'
-                . '</form>';
-        }
-    } catch (Exception $e) {
-        // Si ocurre error, no mostrar botón
-    }
-}
-
-// Procesar navegación y respuestas
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $pid = 'pregunta_' . $preguntas[$preguntaActual]['id_pregunta'];
-    if (isset($_POST[$pid])) {
-        $_SESSION['respuestas_riasec'][$pid] = $_POST[$pid];
-    }
-
-    // Botón siguiente
-    if (isset($_POST['siguiente'])) {
-        if (!isset($_SESSION['respuestas_riasec'][$pid])) {
-            $mensajeError = 'Debes seleccionar una opción antes de continuar.';
-        } else {
-            header('Location: index.php?q=' . ($preguntaActual+1));
-            exit;
-        }
-    }
-
-    // Botón atrás
-    if (isset($_POST['atras'])) {
-        header('Location: index.php?q=' . ($preguntaActual-1));
-        exit;
-    }
-
-    // Botón finalizar
-    if (isset($_POST['finalizar'])) {
-        // Validar que todas las preguntas estén respondidas
-        $faltante = null;
-        foreach ($preguntas as $i => $preg) {
-            $pidCheck = 'pregunta_' . $preg['id_pregunta'];
-            if (!isset($_SESSION['respuestas_riasec'][$pidCheck])) {
-                $faltante = $i;
-                break;
-            }
-        }
-        if ($faltante !== null) {
-            header('Location: index.php?q=' . $faltante . '&error=1');
-            exit;
-        } else {
-            $puntajes = ['R'=>0,'I'=>0,'A'=>0,'S'=>0,'E'=>0,'C'=>0];
-            foreach ($preguntas as $p) {
-                $pidCheck = 'pregunta_' . $p['id_pregunta'];
-                if (isset($_SESSION['respuestas_riasec'][$pidCheck]) && isset($puntajes[$p['categoria']])) {
-                    $puntajes[$p['categoria']] += (int)$_SESSION['respuestas_riasec'][$pidCheck];
-                }
-            }
-            $id_usuario = (isset($_SESSION['id_usuario'])) ? $_SESSION['id_usuario'] : null;
-            crearResultado($id_usuario, $puntajes['R'], $puntajes['I'], $puntajes['A'], $puntajes['S'], $puntajes['E'], $puntajes['C']);
-            $_SESSION['respuestas_riasec'] = $_POST;
-            header('Location: VIEWS/USER/Resultados.php');
-            exit;
-        }
-    }
-}
-
-// Mostrar mensaje de error si viene por GET
-if (isset($_GET['error']) && $_GET['error'] == 1) {
-    $mensajeError = 'Debes responder todas las preguntas antes de finalizar. Te hemos llevado a la primera pregunta sin responder.';
-}
-
+require_once __DIR__ . '/PHP/Funciones/indexF.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -138,9 +29,7 @@ if (isset($_GET['error']) && $_GET['error'] == 1) {
     </div>
     <?php if (empty($preguntas) || empty($opciones)): ?>
         <p>No hay preguntas u opciones disponibles. Contacte al administrador.</p>
-    <?php else:
-        $p = $preguntas[$preguntaActual];
-    ?>
+    <?php else: ?>
     <form method="post" action="index.php?q=<?= $preguntaActual ?>" aria-label="Pregunta RIASEC">
         <fieldset>
             <legend><strong><?= htmlspecialchars($p['texto']) ?></strong></legend>
@@ -168,14 +57,6 @@ if (isset($_GET['error']) && $_GET['error'] == 1) {
             <?php if ($preguntaActual < $totalPreguntas-1): ?>
                 <button type="submit" name="siguiente" value="1" class="btn-pag">Continuar ➜</button>
             <?php else:
-                $todasRespondidas = true;
-                foreach ($preguntas as $preg) {
-                    $pidCheck = 'pregunta_' . $preg['id_pregunta'];
-                    if (!isset($_SESSION['respuestas_riasec'][$pidCheck])) {
-                        $todasRespondidas = false;
-                        break;
-                    }
-                }
             ?>
                 <button type="submit" name="finalizar" value="1" class="btn-pag"<?= ($todasRespondidas ? '' : ' disabled') ?>>Finalizar</button>
             <?php endif; ?>

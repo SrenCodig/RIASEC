@@ -1,15 +1,22 @@
 // Modes.js - Script para alternar modo claro/oscuro con animación de icono
 // Menú de usuario con ventana emergente y opciones avanzadas
+// Comentarios añadidos para explicar cada bloque y variables clave.
 
-// --- MODOS ---
+// Ejecutar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
+    // --------------------------------------------------
+    // Bloque: manejo de modo claro/oscuro (dark mode)
+    // --------------------------------------------------
     const darkModeSwitch = document.getElementById('darkModeSwitch');
     if (darkModeSwitch) {
+        // Leer preferencia desde localStorage y aplicar clase 'active' al body
+        // Nota: en CSS se usa body.active para estilos del modo claro/oscuro
         if (localStorage.getItem('modo') === 'claro') {
             document.body.classList.add('active');
         } else {
             document.body.classList.remove('active');
         }
+        // Al hacer clic en el switch, alternar la clase y guardar la preferencia
         darkModeSwitch.addEventListener('click', function() {
             document.body.classList.toggle('active');
             if (document.body.classList.contains('active')) {
@@ -20,23 +27,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- LOGIN ---
+    // --------------------------------------------------
+    // Bloque: UI de usuario / modal de sesión (login/register)
+    // --------------------------------------------------
+    // Ubicación en el DOM donde se inyecta el botón/menú de usuario
     const userMenu = document.getElementById('user-menu');
-    if (!userMenu) return;
+    if (!userMenu) return; // Si no existe el contenedor, salir silenciosamente
+
+    // Crear botón dinámicamente para mostrar nombre/estado del usuario
     const userBtn = document.createElement('button');
     userBtn.id = 'user-btn';
     userBtn.className = 'user-btn';
-    // Por defecto muestra 'Usuario', luego se actualiza si está logueado
+    // Texto por defecto (se actualiza tras consultar /auth.php?action=status)
     userBtn.textContent = 'Usuario';
     userMenu.appendChild(userBtn);
-    // Actualizar el color del botón de usuario al cambiar modo o nombre
+
+    // Forzar repaint del botón cuando cambian estilos para evitar glitches visuales
     function actualizarColorUserBtn() {
-        // Forzar repaint del botón para que el CSS se aplique correctamente
         userBtn.style.display = 'none';
-        void userBtn.offsetWidth;
+        void userBtn.offsetWidth; // lectura forzada que provoca reflow
         userBtn.style.display = '';
     }
-    // Consultar estado y actualizar el texto del botón
+
+    // Consulta al backend para conocer si hay sesión activa y obtener el nombre
     function actualizarUserBtn() {
         fetch('/RIASEC/PHP/auth.php?action=status')
             .then(res => res.json())
@@ -49,11 +62,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 actualizarColorUserBtn();
             });
     }
+    // Ejecutar al cargar la página
     actualizarUserBtn();
-    // Actualizar color y nombre al cambiar modo
+
+    // Re-evaluar el botón tras cambiar el modo (para que el color se actualice)
     document.getElementById('darkModeSwitch')?.addEventListener('click', function() {
         setTimeout(actualizarUserBtn, 100);
     });
+
+    // Crear modal que mostrará el formulario o acciones del usuario
     const modal = document.createElement('div');
     modal.className = 'user-modal';
     modal.style.display = 'none';
@@ -64,16 +81,22 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     `;
     document.body.appendChild(modal);
+
+    // Mostrar modal al hacer clic sobre el botón de usuario
     userBtn.onclick = function() {
         cargarEstadoUsuario();
         modal.style.display = 'block';
     };
+
+    // Cerrar modal
     modal.querySelector('.close-modal').onclick = function() {
         modal.style.display = 'none';
     };
     window.onclick = function(event) {
         if (event.target === modal) modal.style.display = 'none';
     };
+
+    // Cargar y renderizar el contenido del modal según el estado de autenticación
     function cargarEstadoUsuario() {
         fetch('/RIASEC/PHP/auth.php?action=status')
             .then(res => res.json())
@@ -81,6 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const body = modal.querySelector('#user-modal-body');
                 body.innerHTML = '';
                 if (data.logged) {
+                    // Usuario autenticado: mostrar nombre y acciones (cambiar pass, eliminar, logout)
                     let nombreUsuario = (typeof data.nombre === 'string' && data.nombre.trim() !== '') ? data.nombre : 'Usuario no identificado';
                     body.innerHTML = `
                         <div class="user-info">
@@ -90,18 +114,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         <button class="user-action" id="delete-account-btn">Eliminar cuenta</button>
                         <button class="user-action" id="logout-btn">Cerrar sesión</button>
                     `;
+                    // Si no tenemos nombre fiable, ocultar acciones sensibles
                     if (nombreUsuario === 'Usuario no identificado') {
-                        // Si el nombre está mal, solo permitir cerrar sesión
                         body.querySelector('#change-pass-btn').style.display = 'none';
                         body.querySelector('#delete-account-btn').style.display = 'none';
                     }
+                    // Logout: POST a auth.php?action=logout y recargar página
                     body.querySelector('#logout-btn').onclick = function() {
                         fetch('/RIASEC/PHP/auth.php?action=logout', { method: 'POST' })
                             .then(() => window.location.reload());
                     };
+                    // Mostrar formulario para cambiar contraseña
                     body.querySelector('#change-pass-btn').onclick = function() {
                         mostrarFormulario('cambiar');
                     };
+                    // Eliminar cuenta con confirmación y llamada al endpoint
                     body.querySelector('#delete-account-btn').onclick = function() {
                         if (confirm('¿Seguro que deseas eliminar tu cuenta? Esta acción no se puede deshacer.')) {
                             fetch('/RIASEC/PHP/auth.php?action=delete_account', { method: 'POST' })
@@ -117,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     };
                 } else {
+                    // Usuario no autenticado: mostrar botones de login y registro
                     body.innerHTML = `
                         <button class="user-action" id="login-btn">Iniciar sesión</button>
                         <button class="user-action" id="register-btn">Crear usuario</button>
@@ -130,9 +158,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
     }
+
+    // Renderiza formularios dinámicos para login/registro/cambio de contraseña
     function mostrarFormulario(tipo) {
         const body = modal.querySelector('#user-modal-body');
         if (tipo === 'login') {
+            // Formulario de login: nombre + contraseña
             body.innerHTML = `
                 <form id="user-form">
                     <input type="text" name="nombre" placeholder="Usuario" required><br>
@@ -142,6 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </form>
             `;
         } else if (tipo === 'registro') {
+            // Registro: nombre, correo y doble contraseña
             body.innerHTML = `
                 <form id="user-form">
                     <input type="text" name="nombre" placeholder="Usuario" required><br>
@@ -153,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </form>
             `;
         } else if (tipo === 'cambiar') {
+            // Formulario para cambiar contraseña (solicita actual y nueva)
             body.innerHTML = `
                 <form id="user-form">
                     <input type="password" name="actual" placeholder="Contraseña actual" required><br>
@@ -163,11 +196,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 </form>
             `;
         }
+        // Cancelar vuelve a mostrar el estado de usuario (refrescar contenido del modal)
         document.getElementById('cancelar').onclick = function() { cargarEstadoUsuario(); };
+
+        // Manejar envío del formulario según el tipo
         const form = document.getElementById('user-form');
         form.onsubmit = function(e) {
             e.preventDefault();
             const datos = Object.fromEntries(new FormData(form));
+            // Validaciones front: contraseñas coincidentes
             if (tipo === 'registro' && datos.contrasena !== datos.contrasena2) {
                 alert('Las contraseñas no coinciden');
                 return;
@@ -179,19 +216,24 @@ document.addEventListener('DOMContentLoaded', function() {
             let url = '';
             let payload = {};
             if (tipo === 'login') {
+                // Login: enviar nombre y contraseña al endpoint
                 url = '/RIASEC/PHP/auth.php?action=login';
                 payload = datos;
             } else if (tipo === 'registro') {
-                // --- Lógica para primer usuario admin ---
+                // Para el primer registro podría querer asignar rol administrador
+                // Se consulta status para detectar si no hay usuarios y otorgar rol 1
                 fetch('/RIASEC/PHP/auth.php?action=status')
                     .then(res => res.json())
                     .then(data => {
-                        let id_rol = 2;
+                        let id_rol = 2; // rol por defecto = Usuario
+                        // Nota: el backend actual no devuelve la lista de usuarios en status,
+                        // este bloque intenta detectar primer usuario pero depende de la respuesta
                         if (data && Array.isArray(data.usuarios) && data.usuarios.length === 0) {
-                            id_rol = 1;
+                            id_rol = 1; // si no hay usuarios, asignar Administrador
                         }
                         url = '/RIASEC/PHP/auth.php?action=register';
                         payload = { ...datos, id_rol };
+                        // Enviar petición de registro
                         fetch(url, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -206,8 +248,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         });
                     });
-                return;
+                return; // ya se hace la petición dentro del then
             } else if (tipo === 'cambiar') {
+                // Cambio de contraseña: enviar nueva contraseña al endpoint específico
                 if (!datos.nueva) {
                     alert('Debes ingresar la nueva contraseña');
                     return;
@@ -215,6 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 url = '/RIASEC/PHP/auth.php?action=change_password';
                 payload = { nueva_contrasena: datos.nueva };
             }
+            // Enviar petición (para login y change_password)
             if (tipo !== 'registro') {
                 fetch(url, {
                     method: 'POST',
@@ -232,13 +276,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
     }
-    // --- Carrusel para historial de pruebas ---
+
+    // --------------------------------------------------
+    // Bloque: carrusel (historial de pruebas)
+    // --------------------------------------------------
+    // Seleccionar elementos del DOM que forman el carrusel
     const carrusel = document.querySelector('.carrusel');
     const items = document.querySelectorAll('.carrusel-item');
     const prevButton = document.querySelector('.carrusel-prev');
     const nextButton = document.querySelector('.carrusel-next');
-    let currentIndex = 0;
+    let currentIndex = 0; // índice del item actualmente visible
 
+    // Función que activa/desactiva la clase 'active' en cada item según currentIndex
     function updateCarrusel() {
         items.forEach((item, index) => {
             if (index === currentIndex) {
@@ -249,6 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Hooks de navegación: prev/next con wrap-around
     if (prevButton && nextButton && items.length) {
         prevButton.addEventListener('click', () => {
             currentIndex = (currentIndex === 0) ? items.length - 1 : currentIndex - 1;
@@ -258,6 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
             currentIndex = (currentIndex === items.length - 1) ? 0 : currentIndex + 1;
             updateCarrusel();
         });
+        // Inicializar estado del carrusel
         updateCarrusel();
     }
 });

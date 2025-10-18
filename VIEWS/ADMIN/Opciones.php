@@ -1,13 +1,4 @@
-<!-- PARTE PHP -->
-
-<?php
-// Medida de seguridad del Panel de opciones (solo admin)
-require_once '../../PHP/crud.php';
-session_start();
-if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
-    die('<h2>Acceso denegado. Solo administradores.</h2>');
-}
-?>
+<?php require_once __DIR__ . '/../../PHP/Funciones/OpcionesF.php'; ?>
 
 <!-- PARTE HTML -->
 
