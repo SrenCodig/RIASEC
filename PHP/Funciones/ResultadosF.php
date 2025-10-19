@@ -1,7 +1,3 @@
-<!--
-    Archivo: PHP/Funciones/ResultadosF.php
-    Lógica para preparar datos usados por VIEWS/USER/Resultados.php
--->
 <?php
 // Archivo: PHP/Funciones/ResultadosF.php
 // Lógica para preparar datos usados por VIEWS/USER/Resultados.php

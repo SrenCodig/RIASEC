@@ -1,8 +1,3 @@
-<!--
-	Archivo de utilidad para operaciones CRUD contra la base de datos.
-	Aquí se definen funciones reutilizables para roles, usuarios, preguntas, opciones, resultados y carreras.
--->
-
 <?php
 // Archivo de utilidad para operaciones CRUD contra la base de datos.
 // Aquí se definen funciones reutilizables para roles, usuarios, preguntas, opciones, resultados y carreras.

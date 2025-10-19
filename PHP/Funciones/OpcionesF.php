@@ -1,7 +1,3 @@
-<!--
-    Archivo: PHP/Funciones/OpcionesF.php
-    Lógica mínima para la vista Opciones (seguridad)
--->
 <?php
 // Archivo: PHP/Funciones/OpcionesF.php
 // Lógica mínima para la vista Opciones (seguridad)

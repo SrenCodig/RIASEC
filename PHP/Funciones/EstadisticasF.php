@@ -1,7 +1,3 @@
-<!--
-    Archivo: PHP/Funciones/EstadisticasF.php
-    Lógica para VIEWS/ADMIN/Estadisticas.php
--->
 <?php
 // Archivo: PHP/Funciones/EstadisticasF.php
 // Lógica para VIEWS/ADMIN/Estadisticas.php

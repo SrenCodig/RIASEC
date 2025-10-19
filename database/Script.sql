@@ -109,11 +109,7 @@ CREATE TABLE `carreras` (
     -- Descripción larga de la carrera
     `descripcion` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_uca1400_ai_ci',
     PRIMARY KEY (`id_carrera`) USING BTREE
-)
-COLLATE='utf8mb4_uca1400_ai_ci'
-ENGINE=InnoDB
-AUTO_INCREMENT=101
-;
+);
 
 -- ==========================================================
 -- Datos iniciales (semillas mínimas para el sistema)

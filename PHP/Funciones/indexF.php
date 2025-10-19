@@ -1,8 +1,3 @@
-<!--
-	Archivo: PHP/Funciones/indexF.php
-	Contiene la lógica para preparar datos y procesar el formulario de la prueba RIASEC.
--->
-
 <?php
 // Archivo: PHP/Funciones/indexF.php
 // Contiene la lógica para preparar datos y procesar el formulario de la prueba RIASEC.

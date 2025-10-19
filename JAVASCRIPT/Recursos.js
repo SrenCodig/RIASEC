@@ -52,13 +52,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Consulta al backend para conocer si hay sesión activa y obtener el nombre
     function actualizarUserBtn() {
         fetch('/RIASEC/PHP/auth.php?action=status')
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json().catch(() => ({ logged: false }));
+            })
             .then(data => {
-                if (data.logged && typeof data.nombre === 'string' && data.nombre.trim() !== '') {
+                if (data && data.logged && typeof data.nombre === 'string' && data.nombre.trim() !== '') {
                     userBtn.textContent = data.nombre;
                 } else {
                     userBtn.textContent = 'Usuario';
                 }
+                actualizarColorUserBtn();
+            })
+            .catch(err => {
+                // Loguear en consola para debugging y mantener UI funcional
+                console.warn('No se pudo obtener estado de sesión:', err);
+                userBtn.textContent = 'Usuario';
                 actualizarColorUserBtn();
             });
     }
@@ -99,11 +108,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cargar y renderizar el contenido del modal según el estado de autenticación
     function cargarEstadoUsuario() {
         fetch('/RIASEC/PHP/auth.php?action=status')
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json().catch(() => ({ logged: false }));
+            })
             .then(data => {
                 const body = modal.querySelector('#user-modal-body');
                 body.innerHTML = '';
-                if (data.logged) {
+                if (data && data.logged) {
                     // Usuario autenticado: mostrar nombre y acciones (cambiar pass, eliminar, logout)
                     let nombreUsuario = (typeof data.nombre === 'string' && data.nombre.trim() !== '') ? data.nombre : 'Usuario no identificado';
                     body.innerHTML = `
@@ -156,6 +168,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         mostrarFormulario('registro');
                     };
                 }
+            })
+            .catch(err => {
+                console.warn('Error al cargar estado de usuario:', err);
+                const body = modal.querySelector('#user-modal-body');
+                body.innerHTML = '';
+                // Fallback: mostrar botones de login/registro para no bloquear la UI
+                body.innerHTML = `
+                    <button class="user-action" id="login-btn">Iniciar sesión</button>
+                    <button class="user-action" id="register-btn">Crear usuario</button>
+                `;
+                body.querySelector('#login-btn').onclick = function() { mostrarFormulario('login'); };
+                body.querySelector('#register-btn').onclick = function() { mostrarFormulario('registro'); };
             });
     }
 
