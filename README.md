@@ -165,8 +165,6 @@ Los diagramas UML se encuentran en la carpeta `UML/` dentro del proyecto. En est
 
 Notas finales
 -------------
-- Este README describe la estructura, el flujo y los pasos de instalación para poner en marcha el proyecto en otra máquina. No contiene información personal ni recomendaciones fuera de lo técnico.
-- Si necesitas un archivo `README` con más información técnica (por ejemplo: lista de endpoints de `auth.php` con ejemplos JSON, o una guía de contribución con convenciones de código), puedo generarlo en un segundo paso.
+- `Data.sql` es un archivo de semillas opcional diseñado para enriquecer la base de datos con 60 preguntas de la prueba RIASEC y una lista de 100 carreras con porcentajes por cada letra. Importar este archivo facilita pruebas funcionales, demostraciones y comprobaciones de consistencia sin necesidad de ingresar datos manualmente. No es obligatorio.
 
----
-
+19/10/2025 Ultima actualizacion.
