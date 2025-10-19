@@ -1,3 +1,7 @@
+<!--
+    Archivo: PHP/Funciones/PreguntasF.php
+    Lógica para VIEWS/ADMIN/Preguntas.php (listado, añadir, editar, eliminar)
+-->
 <?php
 // Archivo: PHP/Funciones/PreguntasF.php
 // Lógica para VIEWS/ADMIN/Preguntas.php (listado, añadir, editar, eliminar)

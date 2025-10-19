@@ -1,3 +1,7 @@
+<!--
+    Archivo: PHP/Funciones/ResultadosF.php
+    Lógica para preparar datos usados por VIEWS/USER/Resultados.php
+-->
 <?php
 // Archivo: PHP/Funciones/ResultadosF.php
 // Lógica para preparar datos usados por VIEWS/USER/Resultados.php
@@ -77,66 +81,16 @@ if ($usuarioRegistrado && isset($_GET['id_resultado'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['descargar_detalles'])) {
     $resultadoParaMostrar = $mostrarDetalle && $detalleResultado ? $detalleResultado : $resultadoActual;
     if ($resultadoParaMostrar) {
-        // Calcular perfil del usuario en porcentajes
-        $letras = ['R','I','A','S','E','C'];
-        $preguntas = obtenerPreguntas();
-        $opciones  = obtenerOpciones();
-        $maxValor  = $opciones ? max(array_column($opciones, 'valor')) : 0; // valor máximo de opción
-
-        // Contar cuántas preguntas por letra y calcular puntaje máximo por letra
-        $numPreguntas = array_fill_keys($letras, 0);
-        foreach ($preguntas as $p) $numPreguntas[$p['categoria']]++;
-        $puntajeMax = array_map(fn($n) => $n * $maxValor, $numPreguntas);
-
-        // Extraer puntajes del resultado
-        $puntajes = [
-            'R' => $resultadoParaMostrar['puntaje_R'],
-            'I' => $resultadoParaMostrar['puntaje_I'],
-            'A' => $resultadoParaMostrar['puntaje_A'],
-            'S' => $resultadoParaMostrar['puntaje_S'],
-            'E' => $resultadoParaMostrar['puntaje_E'],
-            'C' => $resultadoParaMostrar['puntaje_C']
-        ];
-
-        // Perfil en porcentaje: puntaje / puntajeMax * 100 (redondeado)
-        $perfilUsuario = [];
-        foreach ($letras as $l) {
-            $perfilUsuario[$l] = $puntajeMax[$l] > 0 ? round($puntajes[$l] / $puntajeMax[$l] * 100) : 0;
-        }
-
-        // Calcular afinidad de este perfil con cada carrera existente
-        $todasCarreras = obtenerCarreras();
-        $afinidades = [];
-        foreach ($todasCarreras as $carrera) {
-            // Construir perfil ideal de la carrera
-            $perfilCarrera = [];
-            foreach ($letras as $l) {
-                $perfilCarrera[$l] = isset($carrera['porcentaje_' . $l]) ? (int)$carrera['porcentaje_' . $l] : 0;
-            }
-            // Distancia absoluta entre perfiles (suma de diferencias)
-            $distancia = 0;
-            foreach ($letras as $l) {
-                $distancia += abs($perfilUsuario[$l] - $perfilCarrera[$l]);
-            }
-            // Afinidad como 100 - (distancia normalizada)
-            $afinidad = 100 - round($distancia / (count($letras) * 100) * 100);
-            $afinidades[] = [
-                'nombre' => $carrera['nombre'],
-                'descripcion' => $carrera['descripcion'],
-                'perfil' => $perfilCarrera,
-                'afinidad' => $afinidad
-            ];
-        }
-        // Ordenar de mayor a menor afinidad
-        usort($afinidades, fn($a, $b) => $b['afinidad'] <=> $a['afinidad']);
+        // Usar la nueva función para obtener perfil y afinidades
+        $calc = calcularPerfilYAfinidades($resultadoParaMostrar);
 
         // Construir texto plano con la información
         $detalles = "PERFIL DEL USUARIO (porcentaje por letra):\n";
-        foreach ($perfilUsuario as $letra => $porc) {
+        foreach ($calc['perfilUsuario'] as $letra => $porc) {
             $detalles .= "$letra: $porc% ";
         }
         $detalles .= "\n\nLISTA COMPLETA DE CARRERAS (ordenadas por afinidad):\n";
-        foreach ($afinidades as $i => $carrera) {
+        foreach ($calc['afinidades'] as $i => $carrera) {
             $detalles .= ($i + 1) . ". " . $carrera['nombre'] . "\n";
             $detalles .= "   Afinidad: " . $carrera['afinidad'] . "%\n";
             $detalles .= "   Perfil ideal: ";
@@ -153,6 +107,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['descargar_detalles'])
         echo $detalles;
         exit;
     }
+}
+
+// Nueva función: calcula perfil en porcentaje y afinidades para un resultado dado
+function calcularPerfilYAfinidades(array $resultadoParaMostrar): array {
+    $letras = ['R','I','A','S','E','C'];
+    $preguntas = obtenerPreguntas();
+    $opciones  = obtenerOpciones();
+    $maxValor  = $opciones ? max(array_column($opciones, 'valor')) : 0; // valor máximo de opción
+
+    // Contar cuántas preguntas por letra y calcular puntaje máximo por letra
+    $numPreguntas = array_fill_keys($letras, 0);
+    foreach ($preguntas as $p) $numPreguntas[$p['categoria']]++;
+    $puntajeMax = array_map(fn($n) => $n * $maxValor, $numPreguntas);
+
+    // Extraer puntajes del resultado
+    $puntajes = [
+        'R' => $resultadoParaMostrar['puntaje_R'],
+        'I' => $resultadoParaMostrar['puntaje_I'],
+        'A' => $resultadoParaMostrar['puntaje_A'],
+        'S' => $resultadoParaMostrar['puntaje_S'],
+        'E' => $resultadoParaMostrar['puntaje_E'],
+        'C' => $resultadoParaMostrar['puntaje_C']
+    ];
+
+    // Perfil en porcentaje: puntaje / puntajeMax * 100 (redondeado)
+    $perfilUsuario = [];
+    foreach ($letras as $l) {
+        $perfilUsuario[$l] = $puntajeMax[$l] > 0 ? round($puntajes[$l] / $puntajeMax[$l] * 100) : 0;
+    }
+
+    // Calcular afinidad de este perfil con cada carrera existente
+    $todasCarreras = obtenerCarreras();
+    $afinidades = [];
+    foreach ($todasCarreras as $carrera) {
+        // Construir perfil ideal de la carrera
+        $perfilCarrera = [];
+        foreach ($letras as $l) {
+            $perfilCarrera[$l] = isset($carrera['porcentaje_' . $l]) ? (int)$carrera['porcentaje_' . $l] : 0;
+        }
+        // Distancia absoluta entre perfiles (suma de diferencias)
+        $distancia = 0;
+        foreach ($letras as $l) {
+            $distancia += abs($perfilUsuario[$l] - $perfilCarrera[$l]);
+        }
+        // Afinidad como 100 - (distancia normalizada)
+        $afinidad = 100 - round($distancia / (count($letras) * 100) * 100);
+        $afinidades[] = [
+            'nombre' => $carrera['nombre'],
+            'descripcion' => $carrera['descripcion'],
+            'perfil' => $perfilCarrera,
+            'afinidad' => $afinidad
+        ];
+    }
+    // Ordenar de mayor a menor afinidad
+    usort($afinidades, fn($a, $b) => $b['afinidad'] <=> $a['afinidad']);
+
+    return [
+        'puntajes' => $puntajes,
+        'perfilUsuario' => $perfilUsuario,
+        'afinidades' => $afinidades,
+    ];
 }
 
 // Las variables definidas aquí ($resultadoActual, $resultadosUsuario, etc.) quedarán disponibles para la vista que incluya este archivo.

@@ -312,3 +312,54 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCarrusel();
     }
 });
+
+// --------------------------------------------------
+// Bloque: validación de formularios de carreras (movido desde Carreras.php)
+// Se ejecuta después de DOMContentLoaded y reutiliza los mismos IDs/elementos
+// que la vista proporciona. No modifica nada en la vista, sólo añade
+// listeners si los formularios existen.
+(function() {
+    function validarPorcentajes(letras, formId, errorId) {
+        let valido = true;
+        let error = '';
+        let total = 0;
+        letras.forEach(function(letra) {
+            let inputId = 'porcentaje_' + letra + (formId === 'form-carrera-edit' ? '_edit' : '');
+            let input = document.getElementById(inputId);
+            if (!input) return;
+            let val = parseInt(input.value, 10);
+            if (isNaN(val) || val < 0 || val > 100) {
+                valido = false;
+                error = 'Todos los porcentajes deben ser números entre 0 y 100.';
+            }
+            total += isNaN(val) ? 0 : val;
+        });
+        if (valido && total > 100 * letras.length) {
+            valido = false;
+            error = 'La suma total de porcentajes no debe exceder ' + (100 * letras.length) + '.';
+        }
+        const errEl = document.getElementById(errorId);
+        if (errEl) {
+            errEl.style.display = valido ? 'none' : 'block';
+            errEl.textContent = error;
+        }
+        return valido;
+    }
+
+    // Registrar listeners si existen los formularios
+    document.addEventListener('DOMContentLoaded', function() {
+        const letras = ['R','I','A','S','E','C'];
+        const formAdd = document.getElementById('form-carrera');
+        if (formAdd) {
+            formAdd.addEventListener('submit', function(e) {
+                if (!validarPorcentajes(letras, 'form-carrera', 'error-carrera')) e.preventDefault();
+            });
+        }
+        const formEdit = document.getElementById('form-carrera-edit');
+        if (formEdit) {
+            formEdit.addEventListener('submit', function(e) {
+                if (!validarPorcentajes(letras, 'form-carrera-edit', 'error-carrera-edit')) e.preventDefault();
+            });
+        }
+    });
+})();

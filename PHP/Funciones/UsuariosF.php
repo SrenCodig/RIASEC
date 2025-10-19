@@ -1,3 +1,8 @@
+<!--
+    Maneja listado, búsqueda, paginación, edición y eliminación de usuarios.
+    Restringido a administradores (rol 1).
+-->
+
 <?php
 // Archivo: PHP/Funciones/UsuariosF.php
 // Lógica para la vista de administración `VIEWS/ADMIN/Usuarios.php`

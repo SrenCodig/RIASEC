@@ -1,3 +1,9 @@
+<!--
+    Vista de gestión de preguntas para administradores en RIASEC.
+    Permite agregar, editar, eliminar y paginar preguntas por categoría.
+    Incluye un formulario para agregar nuevas preguntas y editar existentes.
+-->
+
 <?php require_once __DIR__ . '/../../PHP/Funciones/PreguntasF.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -18,15 +24,15 @@
             <span class="moon"><svg width="32" height="32" viewBox="0 0 32 32"><path d="M22 16a10 10 0 1 1-10-10c0 5.52 4.48 10 10 10z" fill="#fff"/></svg></span>
         </div>
     </div>
-    <nav id="user-menu" class="user-menu-top"></nav>
+    <nav id="user-menu" class="user-menu-top"></nav> <!-- Menú de usuario dinámico -->
     <main>
         <h1>Gestión de Preguntas RIASEC</h1>
         <?php if ($msg): ?>
-            <div class="msg-status"> <?= htmlspecialchars($msg) ?> </div>
+            <div class="msg-status"> <?= htmlspecialchars($msg) ?> </div> <!-- Mensaje de estado -->
         <?php endif; ?>
-        <div class="paginacion-categorias">
+        <div class="paginacion-categorias"> <!-- Botones de categorías -->
             <?php foreach ($categorias as $key => $nombre): ?>
-                <button type="button" onclick="window.location='?categoria=<?= $key ?>'" class="btn-cat<?= $catActual == $key ? ' active' : '' ?>"> <?= $nombre ?> </button>
+                <button type="button" onclick="window.location='?categoria=<?= $key ?>'" class="btn-cat<?= $catActual == $key ? ' active' : '' ?>"> <?= $nombre ?> </button> <!-- Botón de categoría -->
             <?php endforeach; ?>
         </div>
         <section>
@@ -40,7 +46,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($preguntas as $p): ?>
+                    <?php foreach ($preguntas as $p): ?> <!-- Lista de preguntas -->
                         <tr>
                             <td style="font-size:1.35em;font-weight:700;letter-spacing:.5px;"><?= htmlspecialchars($p['texto']) ?></td>
                             <td style="font-size:1.25em;font-weight:600;"><?= $categorias[$p['categoria']] ?></td>
@@ -68,14 +74,15 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            <!-- PAGINACIÓN -->
             <?php
-            $totalPaginas = ceil($totalPreguntas / $preguntasPorPagina);
-            if ($totalPaginas > 1): ?>
-            <div style="display:flex;justify-content:center;gap:.5em;margin:2em 0;">
+            $totalPaginas = ceil($totalPreguntas / $preguntasPorPagina); // Calcular total de páginas
+            if ($totalPaginas > 1): ?> <!-- Mostrar paginación solo si hay más de una página -->
+            <div style="display:flex;justify-content:center;gap:.5em;margin:2em 0;"> <!-- Contenedor de paginación -->
                 <?php
-                $maxBotones = 3;
-                $inicio = max(1, $paginaActual - 1);
-                $fin = min($totalPaginas, $inicio + $maxBotones - 1);
+                $maxBotones = 3; // Máximo de botones a mostrar
+                $inicio = max(1, $paginaActual - 1); // Ajustar inicio para centrar el botón actual
+                $fin = min($totalPaginas, $inicio + $maxBotones - 1); // Ajustar fin según el total de páginas
                 if ($totalPaginas > 10) {
                     // [<<] [<]
                     if ($paginaActual > 1) {
@@ -117,28 +124,28 @@
             <form method="post">
                 <select name="categoria_nueva" class="select-categoria" required>
                     <option value="">Seleccione categoría</option>
-                    <?php foreach ($categorias as $key => $nombre): ?>
+                    <?php foreach ($categorias as $key => $nombre): ?> <!-- Opciones de categoría -->
                         <option value="<?= $key ?>"<?= $catActual == $key ? ' selected' : '' ?>><?= $nombre ?></option>
                     <?php endforeach; ?>
                 </select>
-                <input type="text" name="texto_nueva" class="input-pregunta" placeholder="Texto de la pregunta" required>
-                <button type="submit" name="agregar_pregunta" class="btn-accion">Agregar pregunta</button>
+                <input type="text" name="texto_nueva" class="input-pregunta" placeholder="Texto de la pregunta" required> <!-- Campo de texto -->
+                <button type="submit" name="agregar_pregunta" class="btn-accion">Agregar pregunta</button> <!-- Botón de agregar -->
             </form>
         </section>
         <br>
-        <?php if ($editando && $preguntaEdit): ?>
+        <?php if ($editando && $preguntaEdit): ?> <!-- Sección de edición si se está editando -->
         <section>
             <hr>
             <h2>Editar pregunta</h2>
             <form method="post">
-                <input type="hidden" name="id_editar" value="<?= $preguntaEdit['id_pregunta'] ?>">
-                <select name="categoria_editar" class="select-categoria" required>
-                    <?php foreach ($categorias as $key => $nombre): ?>
-                        <option value="<?= $key ?>"<?= $preguntaEdit['categoria'] == $key ? ' selected' : '' ?>><?= $nombre ?></option>
-                    <?php endforeach; ?>
+                <input type="hidden" name="id_editar" value="<?= $preguntaEdit['id_pregunta'] ?>"> <!-- ID oculto -->
+                <select name="categoria_editar" class="select-categoria" required> <!-- Selección de categoría -->
+                    <?php foreach ($categorias as $key => $nombre): ?> <!-- Opciones de categoría -->
+                        <option value="<?= $key ?>"<?= $preguntaEdit['categoria'] == $key ? ' selected' : '' ?>><?= $nombre ?></option> <!-- Opción seleccionada -->
+                    <?php endforeach; ?> <!-- Fin de opciones -->
                 </select>
-                <input type="text" name="texto_editar" class="input-pregunta" value="<?= htmlspecialchars($preguntaEdit['texto']) ?>" required>
-                <button type="submit" name="editar_pregunta" class="btn-accion">Guardar cambios</button>
+                <input type="text" name="texto_editar" class="input-pregunta" value="<?= htmlspecialchars($preguntaEdit['texto']) ?>" required> <!-- Campo de texto -->
+                <button type="submit" name="editar_pregunta" class="btn-accion">Guardar cambios</button> <!-- Botón de guardar -->
             </form>
         </section>
         <?php endif; ?>

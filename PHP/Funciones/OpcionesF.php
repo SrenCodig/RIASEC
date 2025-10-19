@@ -1,3 +1,7 @@
+<!--
+    Archivo: PHP/Funciones/OpcionesF.php
+    Lógica mínima para la vista Opciones (seguridad)
+-->
 <?php
 // Archivo: PHP/Funciones/OpcionesF.php
 // Lógica mínima para la vista Opciones (seguridad)
@@ -11,7 +15,5 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
     die('<h2>Acceso denegado. Solo administradores.</h2>');
 }
-
-// Actualmente no se necesita más lógica: la vista Opciones.php hace el render.
 
 ?>

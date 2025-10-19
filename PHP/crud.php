@@ -1,3 +1,7 @@
+<!--
+	Archivo de utilidad para operaciones CRUD contra la base de datos.
+	Aquí se definen funciones reutilizables para roles, usuarios, preguntas, opciones, resultados y carreras.
+-->
 
 <?php
 // Archivo de utilidad para operaciones CRUD contra la base de datos.
@@ -5,7 +9,13 @@
 
 require_once __DIR__ . '/config.php';
 
-// Conexión a la base de datos usando MySQLi. Reutiliza las credenciales en config.php
+/**
+ * Establece y devuelve una conexión MySQLi usando las credenciales definidas en `config.php`.
+ * Lanza una excepción si la conexión falla.
+ *
+ * @throws Exception Si no se puede conectar a la base de datos.
+ * @return mysqli Conexión abierta (charset utf8 ya aplicado).
+ */
 function conectar() {
 	global $host, $user, $pass, $db;
 	// Crear instancia de MySQLi
@@ -18,69 +28,6 @@ function conectar() {
 	// Asegurar codificación UTF-8 para evitar problemas con acentos
 	$conn->set_charset('utf8');
 	return $conn;
-}
-
-// ------------------- CRUD ROLES -------------------
-
-/**
- * Crea un nuevo rol.
- * @param string $nombre Nombre del rol
- * @return bool TRUE si se creó correctamente, FALSE si hubo error
- */
-function crearRol($nombre) {
-	// Abrir conexión
-	$conn = conectar();
-	// Prepared statement para prevenir inyección SQL
-	$stmt = $conn->prepare('INSERT INTO roles (nombre) VALUES (?)');
-	$stmt->bind_param('s', $nombre);
-	$res = $stmt->execute();
-	// Cerrar recursos
-	$stmt->close(); $conn->close();
-	return $res;
-}
-
-/**
- * Obtiene todos los roles.
- * @return array Lista de roles
- */
-function obtenerRoles() {
-	// Devuelve todos los roles como array asociativo
-	$conn = conectar();
-	$res = $conn->query('SELECT * FROM roles');
-	$roles = $res->fetch_all(MYSQLI_ASSOC);
-	$res->close(); $conn->close();
-	return $roles;
-}
-
-/**
- * Actualiza un rol existente.
- * @param int $id ID del rol
- * @param string $nombre Nuevo nombre
- * @return bool TRUE si se actualizó, FALSE si hubo error
- */
-function actualizarRol($id, $nombre) {
-	// Actualiza el nombre de un rol por su ID
-	$conn = conectar();
-	$stmt = $conn->prepare('UPDATE roles SET nombre=? WHERE id_rol=?');
-	$stmt->bind_param('si', $nombre, $id);
-	$res = $stmt->execute();
-	$stmt->close(); $conn->close();
-	return $res;
-}
-
-/**
- * Elimina un rol por ID.
- * @param int $id ID del rol
- * @return bool TRUE si se eliminó, FALSE si hubo error
- */
-function eliminarRol($id) {
-	// Elimina un rol por su ID
-	$conn = conectar();
-	$stmt = $conn->prepare('DELETE FROM roles WHERE id_rol=?');
-	$stmt->bind_param('i', $id);
-	$res = $stmt->execute();
-	$stmt->close(); $conn->close();
-	return $res;
 }
 
 // ------------------- CRUD USUARIOS -------------------
@@ -209,21 +156,7 @@ function eliminarPregunta($id) {
 	return $res;
 }
 
-// ------------------- CRUD OPCIONES -------------------
-/**
- * Crea una nueva opción de respuesta.
- * @param int $valor
- * @param string $descripcion
- * @return bool TRUE si se creó, FALSE si hubo error
- */
-function crearOpcion($valor, $descripcion) {
-	$conn = conectar();
-	$stmt = $conn->prepare('INSERT INTO opciones (valor, descripcion) VALUES (?, ?)');
-	$stmt->bind_param('is', $valor, $descripcion);
-	$res = $stmt->execute();
-	$stmt->close(); $conn->close();
-	return $res;
-}
+ // ------------------- CRUD OPCIONES -------------------
 
 /**
  * Obtiene todas las opciones de respuesta.
@@ -235,36 +168,6 @@ function obtenerOpciones() {
 	$opciones = $res->fetch_all(MYSQLI_ASSOC);
 	$res->close(); $conn->close();
 	return $opciones;
-}
-
-/**
- * Actualiza una opción existente.
- * @param int $id
- * @param int $valor
- * @param string $descripcion
- * @return bool TRUE si se actualizó, FALSE si hubo error
- */
-function actualizarOpcion($id, $valor, $descripcion) {
-	$conn = conectar();
-	$stmt = $conn->prepare('UPDATE opciones SET valor=?, descripcion=? WHERE id_opcion=?');
-	$stmt->bind_param('isi', $valor, $descripcion, $id);
-	$res = $stmt->execute();
-	$stmt->close(); $conn->close();
-	return $res;
-}
-
-/**
- * Elimina una opción por ID.
- * @param int $id
- * @return bool TRUE si se eliminó, FALSE si hubo error
- */
-function eliminarOpcion($id) {
-	$conn = conectar();
-	$stmt = $conn->prepare('DELETE FROM opciones WHERE id_opcion=?');
-	$stmt->bind_param('i', $id);
-	$res = $stmt->execute();
-	$stmt->close(); $conn->close();
-	return $res;
 }
 
 // ------------------- CRUD RESULTADOS -------------------
@@ -298,40 +201,6 @@ function obtenerResultados() {
 	$resultados = $res->fetch_all(MYSQLI_ASSOC);
 	$res->close(); $conn->close();
 	return $resultados;
-}
-
-/**
- * Actualiza un resultado existente.
- * @param int $id
- * @param int $r
- * @param int $i
- * @param int $a
- * @param int $s
- * @param int $e
- * @param int $c
- * @return bool TRUE si se actualizó, FALSE si hubo error
- */
-function actualizarResultado($id, $r, $i, $a, $s, $e, $c) {
-	$conn = conectar();
-	$stmt = $conn->prepare('UPDATE resultados SET puntaje_R=?, puntaje_I=?, puntaje_A=?, puntaje_S=?, puntaje_E=?, puntaje_C=? WHERE id_resultado=?');
-	$stmt->bind_param('iiiiiii', $r, $i, $a, $s, $e, $c, $id);
-	$res = $stmt->execute();
-	$stmt->close(); $conn->close();
-	return $res;
-}
-
-/**
- * Elimina un resultado por ID.
- * @param int $id
- * @return bool TRUE si se eliminó, FALSE si hubo error
- */
-function eliminarResultado($id) {
-	$conn = conectar();
-	$stmt = $conn->prepare('DELETE FROM resultados WHERE id_resultado=?');
-	$stmt->bind_param('i', $id);
-	$res = $stmt->execute();
-	$stmt->close(); $conn->close();
-	return $res;
 }
 
 // ------------------- CRUD CARRERAS -------------------
@@ -402,58 +271,6 @@ function eliminarCarrera($id) {
 	$res = $stmt->execute();
 	$stmt->close(); $conn->close();
 	return $res;
-}
-
-
-function obtenerCarrerasRecomendadas($puntajesUsuario) {
-	$carreras = obtenerCarreras();
-	$recomendadas = [];
-	foreach ($carreras as $carrera) {
-		// Calcula la diferencia total entre el perfil y el usuario (porcentajes)
-		$diferencia = abs($puntajesUsuario['R'] - $carrera['porcentaje_R'])
-					+ abs($puntajesUsuario['I'] - $carrera['porcentaje_I'])
-					+ abs($puntajesUsuario['A'] - $carrera['porcentaje_A'])
-					+ abs($puntajesUsuario['S'] - $carrera['porcentaje_S'])
-					+ abs($puntajesUsuario['E'] - $carrera['porcentaje_E'])
-					+ abs($puntajesUsuario['C'] - $carrera['porcentaje_C']);
-		$recomendadas[] = ['nombre' => $carrera['nombre'], 'diferencia' => $diferencia];
-	}
-	// Ordena por menor diferencia
-	usort($recomendadas, fn($a, $b) => $a['diferencia'] <=> $b['diferencia']);
-	// Devuelve las 3 mejores
-	return array_slice($recomendadas, 0, 3);
-}
-
-/**
- * Genera el contenido de un archivo de detalles de carreras recomendadas para el usuario.
- * Ordena todas las carreras por afinidad y muestra la mejor recomendación.
- * @param array $puntajesUsuario Puntajes del usuario (R, I, A, S, E, C)
- * @return string Contenido listo para descargar en .txt
- */
-function generarDetallesCarreras($puntajesUsuario) {
-	$carreras = obtenerCarreras();
-	$detalles = "CARRERAS RECOMENDADAS\n\n";
-	$recomendadas = [];
-	foreach ($carreras as $carrera) {
-		$diferencia = abs($puntajesUsuario['R'] - $carrera['porcentaje_R'])
-					+ abs($puntajesUsuario['I'] - $carrera['porcentaje_I'])
-					+ abs($puntajesUsuario['A'] - $carrera['porcentaje_A'])
-					+ abs($puntajesUsuario['S'] - $carrera['porcentaje_S'])
-					+ abs($puntajesUsuario['E'] - $carrera['porcentaje_E'])
-					+ abs($puntajesUsuario['C'] - $carrera['porcentaje_C']);
-		$recomendadas[] = [
-			'nombre' => $carrera['nombre'],
-			'descripcion' => $carrera['descripcion'],
-			'diferencia' => $diferencia
-		];
-	}
-	usort($recomendadas, fn($a, $b) => $a['diferencia'] <=> $b['diferencia']);
-	$detalles .= "La carrera más recomendada para ti es: " . $recomendadas[0]['nombre'] . "\n\n";
-	$detalles .= "Lista completa ordenada por afinidad:\n";
-	foreach ($recomendadas as $i => $c) {
-		$detalles .= ($i+1) . ". " . $c['nombre'] . "\n   Descripción: " . $c['descripcion'] . "\n   Diferencia de perfil: " . $c['diferencia'] . "\n\n";
-	}
-	return $detalles;
 }
 
 ?>

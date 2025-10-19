@@ -1,3 +1,9 @@
+<!--
+    Vista de gestión de usuarios para administradores en RIASEC.
+    Permite buscar, editar, eliminar y cambiar roles de usuarios.
+    Incluye paginación y un formulario emergente para editar usuarios.
+-->
+
 <?php require_once __DIR__ . '/../../PHP/Funciones/UsuariosF.php'; ?>
 
 <!-- ====================== PARTE HTML ====================== -->
@@ -21,26 +27,26 @@
         </div>
     </div>
 
-    <div id="user-menu" class="user-menu-top"></div>
+    <div id="user-menu" class="user-menu-top"></div> <!-- Menú de usuario -->
     <main>
         <h1>Gestión de Usuarios</h1>
 
-        <?php if ($msg): ?><p class="info"><strong><?= htmlspecialchars($msg) ?></strong></p><?php endif; ?>
+        <?php if ($msg): ?><p class="info"><strong><?= htmlspecialchars($msg) ?></strong></p><?php endif; ?> 
 
         <!-- BÚSQUEDA Y RETORNO -->
-        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:2em;margin-bottom:1.5em;">
-            <form method="get" action="Usuarios.php" style="display:flex;align-items:center;gap:1em;flex:1;min-width:320px;max-width:600px;">
-                <input type="text" name="busqueda" class="pregunta-indicador" placeholder="Buscar por nombre o correo" value="<?= htmlspecialchars($busqueda) ?>">
-                <button type="submit" class="btn-pag" title="Buscar" style="height:64px;width:85px;display:flex;align-items:center;justify-content:center;padding:0;">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:2em;margin-bottom:1.5em;"> <!-- Contenedor flexible -->
+            <form method="get" action="Usuarios.php" style="display:flex;align-items:center;gap:1em;flex:1;min-width:320px;max-width:600px;">  <!-- Formulario de búsqueda -->
+                <input type="text" name="busqueda" class="pregunta-indicador" placeholder="Buscar por nombre o correo" value="<?= htmlspecialchars($busqueda) ?>"> <!-- Campo de búsqueda -->
+                <button type="submit" class="btn-pag" title="Buscar" style="height:64px;width:85px;display:flex;align-items:center;justify-content:center;padding:0;"> <!-- Botón de búsqueda -->
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><line x1="17" y1="17" x2="23" y2="23" stroke="currentColor" stroke-width="2"/></svg>
                 </button>
-                <?php if ($busqueda !== ''): ?>
+                <?php if ($busqueda !== ''): ?> <!-- Botón para limpiar búsqueda -->
                     <button type="button" class="btn-pag" onclick="window.location='Usuarios.php'" title="Limpiar búsqueda" style="height:48px;width:48px;display:flex;align-items:center;justify-content:center;padding:0;">
                         <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><line x1="6" y1="6" x2="16" y2="16" stroke="currentColor" stroke-width="2"/><line x1="16" y1="6" x2="6" y2="16" stroke="currentColor" stroke-width="2"/></svg>
                     </button>
                 <?php endif; ?>
             </form>
-            <form action="Opciones.php" method="get">
+            <form action="Opciones.php" method="get"> <!-- Formulario de retorno a opciones -->
                 <button type="submit" class="btn-retorno" title="Volver a Opciones" style="display:flex;align-items:center;">
                     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="margin-right:.5em;"><polyline points="15,4 7,11 15,18" fill="none" stroke="currentColor" stroke-width="2"/></svg>
                     Volver a Opciones
@@ -52,7 +58,7 @@
         <?php if ($editando && $usuarioEdit): ?>
         <form method="post" style="max-width:1000px;margin:0 auto 2em;">
             <fieldset>
-                <legend>Editar usuario</legend>
+                <legend>Editar usuario</legend> 
                 <input type="hidden" name="id_edit" value="<?= $usuarioEdit['id_usuario'] ?>">
                 <label>Nombre:<input type="text" name="nombre" required value="<?= htmlspecialchars($usuarioEdit['nombre']) ?>"></label>
                 <label>Correo:<input type="email" name="correo" required value="<?= htmlspecialchars($usuarioEdit['correo']) ?>"></label>
@@ -115,12 +121,12 @@
 
         <!-- PAGINACIÓN -->
         <?php if ($totalPaginas > 1): ?>
-            <div style="margin:2em 0;text-align:center;">
-                <?php
-                $maxBotones = 3;
-                $inicio = max(1, $paginaActual - 1);
-                $fin = min($totalPaginas, $inicio + $maxBotones - 1);
-                if ($totalPaginas > 10) {
+            <div style="margin:2em 0;text-align:center;"> <!-- Contenedor de paginación -->
+                <?php // Lógica de paginación
+                $maxBotones = 3; // Máximo de botones a mostrar
+                $inicio = max(1, $paginaActual - 1); // Ajustar inicio para centrar el botón actual
+                $fin = min($totalPaginas, $inicio + $maxBotones - 1); // Ajustar fin según el total de páginas
+                if ($totalPaginas > 10) { 
                     // [<<] [<]
                     if ($paginaActual > 1) {
                         echo "<a href='Usuarios.php?pag=1" . ($busqueda ? "&busqueda=" . urlencode($busqueda) : "") . "' class='btn-pag' title='Primera página'>&lt;&lt;</a> ";
@@ -153,7 +159,6 @@
             </div>
         <?php endif; ?>
     </main>
-
     <script src="/RIASEC/JAVASCRIPT/Recursos.js"></script>
 </body>
 </html>

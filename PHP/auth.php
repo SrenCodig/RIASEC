@@ -1,3 +1,7 @@
+<!--
+    auth.php: login, registro, logout y status en un solo endpoint (con funciones).
+    Maneja autenticación de usuarios para la aplicación RIASEC.
+-->
 <?php
 // auth.php: login, registro, logout y status en un solo endpoint (con funciones)
 // Comentarios añadidos para explicar cada sección y variable sin cambiar lógica.

@@ -1,3 +1,8 @@
+<!--
+    Archivo: PHP/Funciones/CarrerasF.php
+    Lógica para VIEWS/ADMIN/Carreras.php
+-->
+
 <?php
 // Archivo: PHP/Funciones/CarrerasF.php
 // Lógica para VIEWS/ADMIN/Carreras.php

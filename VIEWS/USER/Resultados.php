@@ -1,3 +1,8 @@
+<!--
+    Vista de resultados del test vocacional RIASEC.
+    Muestra los puntajes, perfil y recomendaciones basadas en las respuestas del usuario.
+    Incluye historial de pruebas pasadas para usuarios registrados.
+-->
 <?php
 require_once __DIR__ . '/../../PHP/Funciones/ResultadosF.php';
 ?>
@@ -30,24 +35,24 @@ PARTE HTML (todo el renderizado visual)
     </header>
 
     <main class="resultados-main">
-        <?php if ($usuarioRegistrado): ?>
-        <section class="historial-section">
-            <h2 class="subtitulo">Historial de pruebas realizadas</h2>
-            <?php if (!$resultadosUsuario): ?>
+        <?php if ($usuarioRegistrado): ?> <!-- Si el usuario está registrado -->
+        <section class="historial-section"> <!-- Sección de historial -->
+            <h2 class="subtitulo">Historial de pruebas realizadas</h2> 
+            <?php if (!$resultadosUsuario): ?> <!-- Si no hay resultados -->
                 <p class="info">No tienes pruebas guardadas.</p>
             <?php else: ?>
-            <div class="carrusel-container">
+            <div class="carrusel-container"> <!-- Contenedor del carrusel -->
                 <div class="carrusel" id="historial-carrusel">
-                    <?php foreach ($resultadosUsuario as $index => $res): ?>
-                    <div class="carrusel-item<?= $index === 0 ? ' active' : '' ?>">
-                        <div class="carrusel-card">
-                            <span class="carrusel-fecha">Fecha: <?= htmlspecialchars($res['fecha']) ?></span>
-                            <?php if ($index === 0): ?>
-                                <span class="carrusel-badge badge-ultima">Última realizada</span>
-                            <?php elseif ($index === count($resultadosUsuario)-1): ?>
-                                <span class="carrusel-badge badge-primera">Primera realizada</span>
+                    <?php foreach ($resultadosUsuario as $index => $res): ?> <!-- Itera sobre los resultados del usuario -->
+                    <div class="carrusel-item<?= $index === 0 ? ' active' : '' ?>"> <!-- Marca el primer ítem como activo -->
+                        <div class="carrusel-card"> <!-- Tarjeta del resultado -->
+                            <span class="carrusel-fecha">Fecha: <?= htmlspecialchars($res['fecha']) ?></span> <!-- Muestra la fecha del resultado -->
+                            <?php if ($index === 0): ?> <!-- Si es el más reciente -->
+                                <span class="carrusel-badge badge-ultima">Última realizada</span> <!-- Etiqueta de última realizada -->
+                            <?php elseif ($index === count($resultadosUsuario)-1): ?> <!-- Si es el más antiguo -->
+                                <span class="carrusel-badge badge-primera">Primera realizada</span> <!-- Etiqueta de primera realizada -->
                             <?php endif; ?>
-                            <table class="tabla-historial" aria-label="Puntajes de la prueba">
+                            <table class="tabla-historial" aria-label="Puntajes de la prueba"> <!-- Tabla de puntajes -->
                                 <thead><tr><th>R</th><th>I</th><th>A</th><th>S</th><th>E</th><th>C</th></tr></thead>
                                 <tbody>
                                     <tr>
@@ -60,25 +65,25 @@ PARTE HTML (todo el renderizado visual)
                                     </tr>
                                 </tbody>
                             </table>
-                            <form method="get" class="detalle-form">
-                                <input type="hidden" name="id_resultado" value="<?= htmlspecialchars($res['id_resultado']) ?>">
-                                <button type="submit" class="btn-pag">Ver detalle</button>
+                            <form method="get" class="detalle-form"> <!-- Formulario para ver detalle -->
+                                <input type="hidden" name="id_resultado" value="<?= htmlspecialchars($res['id_resultado']) ?>"> <!-- ID del resultado -->
+                                <button type="submit" class="btn-pag">Ver detalle</button> <!-- Botón para ver detalle -->
                             </form>
                         </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
-                <button class="carrusel-prev" aria-label="Anterior">&#10094;</button>
-                <button class="carrusel-next" aria-label="Siguiente">&#10095;</button>
+                <button class="carrusel-prev" aria-label="Anterior">&#10094;</button> <!-- Botón anterior -->
+                <button class="carrusel-next" aria-label="Siguiente">&#10095;</button> <!-- Botón siguiente -->
             </div>
             <?php endif; ?>
         </section>
         <hr>
         <?php
-        if ($mostrarDetalle && $detalleResultado) {
-            echo '<h2 class="subtitulo">Estás viendo una prueba pasada</h2>';
+        if ($mostrarDetalle && $detalleResultado) { // Si se muestra detalle de un resultado específico
+            echo '<h2 class="subtitulo">Estás viendo una prueba pasada</h2>'; // Título de prueba pasada
         } else {
-            echo '<h2 class="subtitulo">Resultado de tu prueba más reciente</h2>';
+            echo '<h2 class="subtitulo">Resultado de tu prueba más reciente</h2>'; // Título de prueba más reciente
         }
         ?>
         <?php else: ?>
@@ -86,115 +91,75 @@ PARTE HTML (todo el renderizado visual)
         <?php endif; ?>
 
         <?php
+        // Obtener el resultado a mostrar (detalle o actual)
         $resultadoParaMostrar = $mostrarDetalle && $detalleResultado ? $detalleResultado : $resultadoActual;
         if ($resultadoParaMostrar):
-            // 1. Calcular puntajes máximos por letra
-            $letras = ['R','I','A','S','E','C'];
-            $preguntas = obtenerPreguntas();
-            $opciones = obtenerOpciones();
-            $maxValor = $opciones ? max(array_column($opciones,'valor')) : 0;
-            $numPreguntas = array_fill_keys($letras, 0);
-            foreach ($preguntas as $p) $numPreguntas[$p['categoria']]++;
-            $puntajeMax = array_map(fn($n)=>$n*$maxValor, $numPreguntas);
-
-            // 2. Calcular perfil usuario en porcentaje
-            $puntajes = [
-                'R' => $resultadoParaMostrar['puntaje_R'],
-                'I' => $resultadoParaMostrar['puntaje_I'],
-                'A' => $resultadoParaMostrar['puntaje_A'],
-                'S' => $resultadoParaMostrar['puntaje_S'],
-                'E' => $resultadoParaMostrar['puntaje_E'],
-                'C' => $resultadoParaMostrar['puntaje_C']
-            ];
-            $perfilUsuario = [];
-            foreach ($letras as $l) {
-                $perfilUsuario[$l] = $puntajeMax[$l] > 0 ? round($puntajes[$l] / $puntajeMax[$l] * 100) : 0;
-            }
-            arsort($perfilUsuario);
-            $dominantes = array_slice(array_keys($perfilUsuario), 0, 3);
-
-            // 3. Calcular afinidad con cada carrera
-            $todasCarreras = obtenerCarreras();
-            $afinidades = [];
-            foreach ($todasCarreras as $carrera) {
-                $perfilCarrera = [];
-                foreach ($letras as $l) {
-                    $perfilCarrera[$l] = isset($carrera['porcentaje_' . $l]) ? (int)$carrera['porcentaje_' . $l] : 0;
-                }
-                // Distancia absoluta
-                $distancia = 0;
-                foreach ($letras as $l) {
-                    $distancia += abs($perfilUsuario[$l] - $perfilCarrera[$l]);
-                }
-                // Afinidad: 100 - (distancia total / (6*100))*100
-                $afinidad = 100 - round($distancia / (count($letras)*100) * 100);
-                $afinidades[] = [
-                    'nombre' => $carrera['nombre'],
-                    'descripcion' => $carrera['descripcion'],
-                    'perfil' => $perfilCarrera,
-                    'afinidad' => $afinidad
-                ];
-            }
-            // Ordenar por mayor afinidad
-            usort($afinidades, fn($a,$b)=>$b['afinidad'] <=> $a['afinidad']);
+            // Usar la función centralizada para calcular puntajes, perfil y afinidades
+            $calc = calcularPerfilYAfinidades($resultadoParaMostrar);
+            $puntajes = $calc['puntajes']; 
+            $perfilUsuario = $calc['perfilUsuario'];
+            $afinidades = $calc['afinidades'];
             $carrerasRecomendadas = array_slice($afinidades, 0, 3);
-
-            // 4. Perfil narrativo
+            // Determinar las 3 letras dominantes
+            $ordenadas = $perfilUsuario;
+            arsort($ordenadas);
+            $dominantes = array_slice(array_keys($ordenadas), 0, 3);
+            // Construir el texto narrativo del perfil
             $perfil = "Tu perfil vocacional dominante es: <strong>" . implode(", ", $dominantes) . "</strong>.<br>Esto significa que tienes una combinación de intereses y habilidades en los siguientes ámbitos:<ul>";
             foreach ($dominantes as $letra) $perfil .= "<li><strong>$letra</strong>: {$explicaciones[$letra]}</li>";
             $perfil .= "</ul>Personas con este perfil suelen destacar en áreas donde se combinan estas características. Te recomendamos explorar carreras y ocupaciones que integren estos intereses.";
         ?>
-        <section class="resultado-section">
-            <article class="puntajes-article">
-                <h3 class="subtitulo">Puntajes totales (ordenados):</h3>
+        <section class="resultado-section"> <!-- Sección de resultado -->
+            <article class="puntajes-article"> <!-- Artículo de puntajes -->
+                <h3 class="subtitulo">Puntajes totales (ordenados):</h3> <!-- Artículo de puntajes -->
                 <ul class="puntajes-lista">
-                    <?php foreach ($puntajes as $letra => $valor): ?>
+                    <?php foreach ($puntajes as $letra => $valor): ?> <!-- Itera sobre los puntajes -->
                     <li class="puntaje-item">
-                        <span class="puntaje-circulo">
+                        <span class="puntaje-circulo"> <!-- Círculo del puntaje -->
                             <span class="puntaje-letra"><?= $letra ?></span>
                             <span class="puntaje-numero"><?= $valor ?></span>
                         </span>
-                        <span class="explicacion"><?= $explicaciones[$letra] ?></span>
+                        <span class="explicacion"><?= $explicaciones[$letra] ?></span> <!-- Explicación del puntaje -->
                     </li>
                     <?php endforeach; ?>
                 </ul>
             </article>
 
-            <article class="dominantes-article">
+            <article class="dominantes-article"> <!-- Artículo de letras dominantes y carreras -->
                 <h3 class="subtitulo">Tus 3 letras dominantes:</h3>
                 <ul class="dominantes-lista">
-                    <?php foreach ($dominantes as $letra): ?>
+                    <?php foreach ($dominantes as $letra): ?> <!-- Itera sobre las letras dominantes -->
                     <li class="dominante-item">
                         <span class="letra-dominante"><span class="letra-dominante-texto"><?= $letra ?></span></span>
-                        <span class="explicacion-dominante"><?= $explicaciones[$letra] ?></span>
+                        <span class="explicacion-dominante"><?= $explicaciones[$letra] ?></span> <!-- Explicación de la letra dominante -->
                     </li>
                     <?php endforeach; ?>
                 </ul>
 
                 <h3 class="subtitulo">Tus 3 mejores carreras recomendadas:</h3>
                 <ul class="carreras-nombres-lista">
-                    <?php foreach ($carrerasRecomendadas as $carrera): ?>
+                    <?php foreach ($carrerasRecomendadas as $carrera): ?> <!-- Itera sobre las carreras recomendadas -->
                     <li class="carrera-nombre-item">
-                        <span class="carrera-nombre-texto"><?= htmlspecialchars($carrera['nombre']) ?></span>
+                        <span class="carrera-nombre-texto"><?= htmlspecialchars($carrera['nombre']) ?></span> 
                     </li>
                     <?php endforeach; ?>
                     <li style="list-style:none;margin-top:1em;text-align:center;">
                         <form method="post" action="">
-                            <input type="hidden" name="descargar_detalles" value="1">
-                            <button type="submit" class="btn-pag">Ver detalles</button>
+                            <input type="hidden" name="descargar_detalles" value="1"> 
+                            <button type="submit" class="btn-pag">Ver detalles</button> <!-- Botón para ver detalles -->
                         </form>
                     </li>
                 </ul>
             </article>
 
             <article class="perfil-article">
-                <h3 class="subtitulo">Perfil narrativo:</h3>
+                <h3 class="subtitulo">Perfil narrativo:</h3> <!-- Artículo de perfil narrativo -->
                 <div class="perfil-narrativo perfil-narrativo-simple">
                     <div class="perfil-narrativo-texto"><?= $perfil ?></div>
                     <section class="carreras-descripcion-section perfil-narrativo-carreras">
                         <h4 class="carreras-descripcion-titulo">Tus 3 carreras recomendadas y sus descripciones:</h4>
                         <ul class="carreras-descripcion-lista">
-                            <?php foreach ($carrerasRecomendadas as $carrera): ?>
+                            <?php foreach ($carrerasRecomendadas as $carrera): ?> <!-- Itera sobre las carreras recomendadas -->
                             <li class="carrera-descripcion-item">
                                 <strong class="carrera-descripcion-nombre"><?= htmlspecialchars($carrera['nombre']) ?>:</strong>
                                 <span class="carrera-descripcion-texto"> <?= htmlspecialchars($carrera['descripcion']) ?></span>
@@ -205,13 +170,13 @@ PARTE HTML (todo el renderizado visual)
                 </div>
             </article>
         </section>
-        <?php else: ?>
-            <p class="info">No se recibieron respuestas.</p>
+        <?php else: ?> 
+            <p class="info">No se recibieron respuestas.</p> <!-- Mensaje si no hay resultado -->
         <?php endif; ?>
 
         <footer class="resultados-footer">
             <form action="../../index.php" method="get" class="volver-form">
-                <button type="submit" class="btn-pag">Volver al inicio</button>
+                <button type="submit" class="btn-pag">Volver al inicio</button> <!-- Botón para volver al inicio -->
             </form>
         </footer>
     </main>

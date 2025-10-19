@@ -1,3 +1,8 @@
+<!--
+    Vista principal del test vocacional RIASEC.
+    Muestra las preguntas y opciones para que el usuario pueda responder.
+    Incluye navegación entre preguntas y finalización del test.
+-->
 <?php
 require_once __DIR__ . '/PHP/Funciones/indexF.php';
 ?>
@@ -23,42 +28,42 @@ require_once __DIR__ . '/PHP/Funciones/indexF.php';
     <div id="user-menu" class="user-menu-top"></div>
     <main>
     <h1>Descubre tus intereses profesionales</h1>
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1em;">
-        <?= $panelAdmin ?: '<span></span>' ?>
-        <?= $verHistorial ?: '<span></span>' ?>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1em;"> <!-- Contenedor para los botones superiores -->
+        <?= $panelAdmin ?: '<span></span>' ?> <!-- Espacio para el panel de administración -->
+        <?= $verHistorial ?: '<span></span>' ?> <!-- Espacio para ver historial -->
     </div>
-    <?php if (empty($preguntas) || empty($opciones)): ?>
+    <?php if (empty($preguntas) || empty($opciones)): ?> <!-- Verifica si hay preguntas y opciones -->
         <p>No hay preguntas u opciones disponibles. Contacte al administrador.</p>
     <?php else: ?>
-    <form method="post" action="index.php?q=<?= $preguntaActual ?>" aria-label="Pregunta RIASEC">
+    <form method="post" action="index.php?q=<?= $preguntaActual ?>" aria-label="Pregunta RIASEC"> <!-- Formulario de preguntas -->
         <fieldset>
-            <legend><strong><?= htmlspecialchars($p['texto']) ?></strong></legend>
-            <div class="opciones-contenedor">
-                <?php foreach ($opciones as $o): ?>
-                    <label class="card-option">
-                        <input type="radio" name="pregunta_<?= $p['id_pregunta'] ?>" value="<?= $o['valor'] ?>"
-                            <?php if (isset($_SESSION['respuestas_riasec']['pregunta_' . $p['id_pregunta']]) && $_SESSION['respuestas_riasec']['pregunta_' . $p['id_pregunta']] == $o['valor']) echo 'checked'; ?> >
-                        <div class="card-radio"></div>
-                        <span class="card-text"><?= htmlspecialchars($o['descripcion']) ?></span>
+            <legend><strong><?= htmlspecialchars($p['texto']) ?></strong></legend> <!-- Muestra la pregunta actual -->
+            <div class="opciones-contenedor"> <!-- Contenedor de opciones -->
+                <?php foreach ($opciones as $o): ?> <!-- Itera sobre las opciones -->
+                    <label class="card-option"> 
+                        <input type="radio" name="pregunta_<?= $p['id_pregunta'] ?>" value="<?= $o['valor'] ?>" 
+                            <?php if (isset($_SESSION['respuestas_riasec']['pregunta_' . $p['id_pregunta']]) && $_SESSION['respuestas_riasec']['pregunta_' . $p['id_pregunta']] == $o['valor']) echo 'checked'; ?> > <!-- Marca la opción seleccionada -->
+                        <div class="card-radio"></div> 
+                        <span class="card-text"><?= htmlspecialchars($o['descripcion']) ?></span> <!-- Muestra la descripción de la opción -->
                     </label>
-                <?php endforeach; ?>
+                <?php endforeach; ?> <!-- Fin del bucle de opciones -->
             </div>
         </fieldset>
-        <?php if ($mensajeError): ?>
-            <p style="color:#c00;font-weight:bold;text-align:center;"><?= $mensajeError ?></p>
-        <?php endif; ?>
+        <?php if ($mensajeError): ?> <!-- Muestra mensaje de error si existe -->
+            <p style="color:#c00;font-weight:bold;text-align:center;"><?= $mensajeError ?></p> <!-- Mensaje de error -->
+        <?php endif; ?> <!-- Fin de la verificación de mensaje de error -->
         <div style="display:flex;justify-content:space-between;margin-top:1em;">
-            <?php if ($preguntaActual > 0): ?>
-                <button type="submit" name="atras" value="1" class="btn-pag">&lt; Atrás</button>
+            <?php if ($preguntaActual > 0): ?> 
+                <button type="submit" name="atras" value="1" class="btn-pag">&lt; Atrás</button> <!-- Botón para ir a la pregunta anterior -->
             <?php else: ?>
-                <span></span>
+                <span></span> <!-- Espacio vacío si es la primera pregunta -->
             <?php endif; ?>
-            <span class="pregunta-indicador">Pregunta <?= ($preguntaActual+1) ?> de <?= $totalPreguntas ?></span>
-            <?php if ($preguntaActual < $totalPreguntas-1): ?>
-                <button type="submit" name="siguiente" value="1" class="btn-pag">Continuar ➜</button>
+            <span class="pregunta-indicador">Pregunta <?= ($preguntaActual+1) ?> de <?= $totalPreguntas ?></span> <!-- Indicador de la pregunta actual -->
+            <?php if ($preguntaActual < $totalPreguntas-1): ?> <!-- Si no es la última pregunta -->
+                <button type="submit" name="siguiente" value="1" class="btn-pag">Continuar ➜</button> <!-- Botón para ir a la siguiente pregunta -->
             <?php else:
             ?>
-                <button type="submit" name="finalizar" value="1" class="btn-pag"<?= ($todasRespondidas ? '' : ' disabled') ?>>Finalizar</button>
+                <button type="submit" name="finalizar" value="1" class="btn-pag"<?= ($todasRespondidas ? '' : ' disabled') ?>>Finalizar</button> <!-- Botón para finalizar el test -->
             <?php endif; ?>
         </div>
     </form>

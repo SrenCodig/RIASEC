@@ -1,3 +1,9 @@
+<!--
+    Vista de gestión de carreras para administradores en RIASEC.
+    Permite agregar, editar, eliminar y paginar carreras.
+    Incluye formularios para agregar nuevas carreras y editar existentes.
+-->
+
 <?php require_once __DIR__ . '/../../PHP/Funciones/CarrerasF.php'; ?>
 
 <!DOCTYPE html>
@@ -12,21 +18,23 @@
     <link rel="stylesheet" href="/RIASEC/STYLE/DarkMode.css">
 </head>
 <body>
+    <!-- === Switch de modo oscuro / claro === -->
     <div class="dark-mode-switch" id="darkModeSwitch">
         <div class="circle">
             <span class="sun"><svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="#FCDE5B"/><g stroke="#FCDE5B" stroke-width="2"><line x1="16" y1="2" x2="16" y2="8"/><line x1="16" y1="24" x2="16" y2="30"/><line x1="2" y1="16" x2="8" y2="16"/><line x1="24" y1="16" x2="30" y2="16"/><line x1="6.34" y1="6.34" x2="10.49" y2="10.49"/><line x1="21.51" y1="21.51" x2="25.66" y2="25.66"/><line x1="6.34" y1="25.66" x2="10.49" y2="21.51"/><line x1="21.51" y1="10.49" x2="25.66" y2="6.34"/></g></svg></span>
             <span class="moon"><svg width="32" height="32" viewBox="0 0 32 32"><path d="M22 16a10 10 0 1 1-10-10c0 5.52 4.48 10 10 10z" fill="#fff"/></svg></span>
         </div>
     </div>
+        <!-- === MENÚ SUPERIOR DEL USUARIO === -->
     <nav id="user-menu" class="user-menu-top"></nav>
     <main>
         <h1>Gestión de Carreras</h1>
-        <div style="margin-bottom:1.5em;">
-            <form action="Opciones.php" method="get" style="display:inline;">
-                <button type="submit" class="opcion-btn" style="padding:.7em 2em;font-size:1.1em;">&larr; Volver a Opciones</button>
+        <div style="margin-bottom:1.5em;"> <!-- Botón para volver a Opciones -->
+            <form action="Opciones.php" method="get" style="display:inline;"> <!-- Formulario para volver a Opciones -->
+                <button type="submit" class="opcion-btn" style="padding:.7em 2em;font-size:1.1em;">&larr; Volver a Opciones</button> <!-- Botón de volver -->
             </form>
         </div>
-        <?php if ($msg): ?>
+        <?php if ($msg): ?> <!-- Mostrar mensaje de estado si existe -->
             <div class="msg-status"> <?= htmlspecialchars($msg) ?> </div>
         <?php endif; ?>
         <section>
@@ -45,7 +53,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($carrerasPagina as $c): ?>
+                    <?php foreach ($carrerasPagina as $c): ?> <!-- Iterar sobre las carreras de la página actual -->
                         <tr>
                             <td><?= htmlspecialchars($c['nombre']) ?></td>
                             <td><?= htmlspecialchars($c['descripcion'] ?? '') ?></td>
@@ -56,7 +64,7 @@
                             <td><?= (int)$c['porcentaje_E'] ?></td>
                             <td><?= (int)$c['porcentaje_C'] ?></td>
                             <td style="text-align:center;">
-                                <div style="display:flex;gap:.5em;justify-content:center;align-items:center;">
+                                <div style="display:flex;gap:.5em;justify-content:center;align-items:center;"> <!-- Botones de editar y eliminar -->
                                     <form method="get" style="display:inline;">
                                         <input type="hidden" name="editar" value="<?= $c['id_carrera'] ?>">
                                         <input type="hidden" name="pag" value="<?= $paginaActual ?>">
@@ -77,35 +85,36 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
-            <?php
-            $totalPaginas = ceil($totalCarreras / $carrerasPorPagina);
-            if ($totalPaginas > 1): ?>
+            <!-- Paginación -->
+            <?php 
+            $totalPaginas = ceil($totalCarreras / $carrerasPorPagina); // Calcular total de páginas
+            if ($totalPaginas > 1): ?> <!-- Mostrar paginación solo si hay más de una página -->    
             <div style="display:flex;justify-content:center;gap:.5em;margin:2em 0;">
                 <?php
-                $maxBotones = 3;
-                $inicioPag = max(1, $paginaActual - 1);
-                $finPag = min($totalPaginas, $inicioPag + $maxBotones - 1);
-                if ($totalPaginas > 5) {
-                    if ($paginaActual > 1) {
+                $maxBotones = 3; // Máximo de botones de página a mostrar
+                $inicioPag = max(1, $paginaActual - 1); // Página de inicio
+                $finPag = min($totalPaginas, $inicioPag + $maxBotones - 1); // Página de fin
+                if ($totalPaginas > 5) { // Si hay muchas páginas, ajustar inicio y fin
+                    if ($paginaActual > 1) { // Si no es la primera página
                         echo '<form method="get" style="display:inline;"><input type="hidden" name="pag" value="1"><button type="submit" class="btn-accion" title="Primera página">&lt;&lt;</button></form> ';
                         echo '<form method="get" style="display:inline;"><input type="hidden" name="pag" value="' . ($paginaActual - 1) . '"><button type="submit" class="btn-accion" title="Anterior">&lt;</button></form> ';
                     }
-                    for ($i = $inicioPag; $i <= $finPag; $i++) {
-                        if ($i == $paginaActual) {
+                    for ($i = $inicioPag; $i <= $finPag; $i++) { // Botones de página
+                        if ($i == $paginaActual) { // Página actual
                             echo '<button class="btn-accion" style="background:#0a2342;color:#fff;" disabled>' . $i . '</button> ';
-                        } else {
+                        } else { // Otras páginas
                             echo '<form method="get" style="display:inline;"><input type="hidden" name="pag" value="' . $i . '"><button type="submit" class="btn-accion">' . $i . '</button></form> ';
                         }
                     }
-                    if ($paginaActual < $totalPaginas) {
+                    if ($paginaActual < $totalPaginas) { // Si no es la última página
                         echo '<form method="get" style="display:inline;"><input type="hidden" name="pag" value="' . ($paginaActual + 1) . '"><button type="submit" class="btn-accion" title="Siguiente">&gt;</button></form> ';
                         echo '<form method="get" style="display:inline;"><input type="hidden" name="pag" value="' . $totalPaginas . '"><button type="submit" class="btn-accion" title="Última página">&gt;&gt;</button></form> ';
                     }
                 } else {
-                    for ($i = 1; $i <= $totalPaginas; $i++) {
-                        if ($i == $paginaActual) {
+                    for ($i = 1; $i <= $totalPaginas; $i++) { // Mostrar todos los botones si pocas páginas
+                        if ($i == $paginaActual) { // Página actual
                             echo '<button class="btn-accion" style="background:#0a2342;color:#fff;" disabled>' . $i . '</button> ';
-                        } else {
+                        } else { // Otras páginas
                             echo '<form method="get" style="display:inline;"><input type="hidden" name="pag" value="' . $i . '"><button type="submit" class="btn-accion">' . $i . '</button></form> ';
                         }
                     }
@@ -116,45 +125,45 @@
         </section>
         <section>
             <h2>Agregar nueva carrera</h2>
-            <form method="post" id="form-carrera" autocomplete="off">
-                <input type="text" name="nombre" class="input-pregunta" placeholder="Nombre de la carrera" required>
-                <input type="text" name="descripcion" class="input-pregunta" placeholder="Descripción">
+            <form method="post" id="form-carrera" autocomplete="off"> <!-- Formulario para agregar carrera -->
+                <input type="text" name="nombre" class="input-pregunta" placeholder="Nombre de la carrera" required> <!-- Campo de nombre -->
+                <input type="text" name="descripcion" class="input-pregunta" placeholder="Descripción"> <!-- Campo de descripción -->
                 <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em 0;">
-                    <?php $letras = ['R','I','A','S','E','C']; foreach ($letras as $letra): ?>
+                    <?php $letras = ['R','I','A','S','E','C']; foreach ($letras as $letra): ?> <!-- Campos de porcentaje por letra -->
                         <div style="display:flex;flex-direction:column;align-items:center;">
-                            <label for="porcentaje_<?= $letra ?>" style="font-weight:700;"><?= $letra ?></label>
-                            <input type="number" name="porcentaje_<?= $letra ?>" id="porcentaje_<?= $letra ?>" min="0" max="100" inputmode="numeric" pattern="[0-9]*" style="width:70px;text-align:center;appearance:textfield;-webkit-appearance:textfield;" required>
+                            <label for="porcentaje_<?= $letra ?>" style="font-weight:700;"><?= $letra ?></label> <!-- Etiqueta de letra -->
+                            <input type="number" name="porcentaje_<?= $letra ?>" id="porcentaje_<?= $letra ?>" min="0" max="100" inputmode="numeric" pattern="[0-9]*" style="width:70px;text-align:center;appearance:textfield;-webkit-appearance:textfield;" required> <!-- Campo de porcentaje -->
                         </div>
-                    <?php endforeach; ?>
+                    <?php endforeach; ?> <!-- Fin de campos de porcentaje por letra -->
                 </div>
-                <button type="submit" name="agregar_carrera" class="btn-accion">Agregar carrera</button>
-                <div id="error-carrera" style="color:red;font-weight:700;margin-top:1em;display:none;"></div>
+                <button type="submit" name="agregar_carrera" class="btn-accion">Agregar carrera</button> <!-- Botón de agregar -->
+                <div id="error-carrera" style="color:red;font-weight:700;margin-top:1em;display:none;"></div> <!-- Div para mostrar errores -->
             </form>
         </section>
         <br>
-        <?php if ($editando && $carreraEdit): ?>
+        <?php if ($editando && $carreraEdit): ?> <!-- Sección de edición si se está editando -->
         <section>
             <hr>
             <h2>Editar carrera</h2>
-            <form method="post" id="form-carrera-edit" autocomplete="off">
-                <input type="hidden" name="id_edit" value="<?= $carreraEdit['id_carrera'] ?>">
-                <input type="text" name="nombre_edit" class="input-pregunta" value="<?= htmlspecialchars($carreraEdit['nombre']) ?>" required>
-                <input type="text" name="descripcion_edit" class="input-pregunta" value="<?= htmlspecialchars($carreraEdit['descripcion'] ?? '') ?>">
+            <form method="post" id="form-carrera-edit" autocomplete="off"> <!-- Formulario para editar carrera -->
+                <input type="hidden" name="id_edit" value="<?= $carreraEdit['id_carrera'] ?>"> <!-- Campo oculto con ID de carrera -->
+                <input type="text" name="nombre_edit" class="input-pregunta" value="<?= htmlspecialchars($carreraEdit['nombre']) ?>" required> <!-- Campo de nombre -->
+                <input type="text" name="descripcion_edit" class="input-pregunta" value="<?= htmlspecialchars($carreraEdit['descripcion'] ?? '') ?>"> <!-- Campo de descripción -->
                 <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em 0;">
-                    <?php foreach ($letras as $letra): ?>
+                    <?php foreach ($letras as $letra): ?> <!-- Campos de porcentaje por letra -->
                         <div style="display:flex;flex-direction:column;align-items:center;">
-                            <label for="porcentaje_<?= $letra ?>_edit" style="font-weight:700;"><?= $letra ?></label>
-                            <input type="number" name="porcentaje_<?= $letra ?>_edit" id="porcentaje_<?= $letra ?>_edit" min="0" max="100" inputmode="numeric" pattern="[0-9]*" style="width:70px;text-align:center;appearance:textfield;-webkit-appearance:textfield;" value="<?= (int)$carreraEdit['porcentaje_' . $letra] ?>" required>
+                            <label for="porcentaje_<?= $letra ?>_edit" style="font-weight:700;"><?= $letra ?></label> <!-- Etiqueta de letra -->
+                            <input type="number" name="porcentaje_<?= $letra ?>_edit" id="porcentaje_<?= $letra ?>_edit" min="0" max="100" inputmode="numeric" pattern="[0-9]*" style="width:70px;text-align:center;appearance:textfield;-webkit-appearance:textfield;" value="<?= (int)$carreraEdit['porcentaje_' . $letra] ?>" required> <!-- Campo de porcentaje -->
                         </div>
                     <?php endforeach; ?>
                 </div>
-                <button type="submit" name="editar_carrera" class="btn-accion">Guardar cambios</button>
-                <div id="error-carrera-edit" style="color:red;font-weight:700;margin-top:1em;display:none;"></div>
+                <button type="submit" name="editar_carrera" class="btn-accion">Guardar cambios</button> <!-- Botón de guardar cambios -->
+                <div id="error-carrera-edit" style="color:red;font-weight:700;margin-top:1em;display:none;"></div> <!-- Div para mostrar errores -->
             </form>
         </section>
         <?php endif; ?>
     </main>
-    <style>
+    <style> 
     /* Ocultar flechas de los inputs number */
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button {
         -webkit-appearance: none;
@@ -165,37 +174,6 @@
     }
     </style>
     <script src="/RIASEC/JAVASCRIPT/Recursos.js"></script>
-    <script>
-    // Validación JS para los formularios de carrera
-    function validarPorcentajes(letras, formId, errorId) {
-        let valido = true;
-        let error = '';
-        let total = 0;
-        letras.forEach(function(letra) {
-            let input = document.getElementById('porcentaje_' + letra + (formId === 'form-carrera-edit' ? '_edit' : ''));
-            let val = parseInt(input.value, 10);
-            if (isNaN(val) || val < 0 || val > 100) {
-                valido = false;
-                error = 'Todos los porcentajes deben ser números entre 0 y 100.';
-            }
-            total += val;
-        });
-        if (valido && total > 100*letras.length) {
-            valido = false;
-            error = 'La suma total de porcentajes no debe exceder ' + (100*letras.length) + '.';
-        }
-        document.getElementById(errorId).style.display = valido ? 'none' : 'block';
-        document.getElementById(errorId).textContent = error;
-        return valido;
-    }
-    document.getElementById('form-carrera')?.addEventListener('submit', function(e) {
-        let letras = ['R','I','A','S','E','C'];
-        if (!validarPorcentajes(letras, 'form-carrera', 'error-carrera')) e.preventDefault();
-    });
-    document.getElementById('form-carrera-edit')?.addEventListener('submit', function(e) {
-        let letras = ['R','I','A','S','E','C'];
-        if (!validarPorcentajes(letras, 'form-carrera-edit', 'error-carrera-edit')) e.preventDefault();
-    });
-    </script>
+    
 </body>
 </html>

@@ -1,3 +1,9 @@
+<!--
+    Vista de estadísticas para administradores en RIASEC.
+    Muestra estadísticas detalladas de los resultados del test vocacional.
+    Incluye tablas y gráficos para análisis visual.
+-->
+
 <?php require_once __DIR__ . '/../../PHP/Funciones/EstadisticasF.php'; ?>
 
 <!-- === ESTRUCTURA HTML === -->
@@ -15,29 +21,11 @@
 </head>
 
 <body>
-    <!-- Switch modo oscuro -->
-    <div class="dark-mode-switch" id="darkModeSwitch">
+    <!-- Switch de modo oscuro / claro -->
+    <div class="dark-mode-switch" id="darkModeSwitch"> 
         <div class="circle">
-            <span class="sun">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="16" cy="16" r="10" fill="#FCDE5B"/>
-                    <g stroke="#FCDE5B" stroke-width="2">
-                        <line x1="16" y1="2" x2="16" y2="8"/>
-                        <line x1="16" y1="24" x2="16" y2="30"/>
-                        <line x1="2" y1="16" x2="8" y2="16"/>
-                        <line x1="24" y1="16" x2="30" y2="16"/>
-                        <line x1="6.34" y1="6.34" x2="10.49" y2="10.49"/>
-                        <line x1="21.51" y1="21.51" x2="25.66" y2="25.66"/>
-                        <line x1="6.34" y1="25.66" x2="10.49" y2="21.51"/>
-                        <line x1="21.51" y1="10.49" x2="25.66" y2="6.34"/>
-                    </g>
-                </svg>
-            </span>
-            <span class="moon">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22 16a10 10 0 1 1-10-10c0 5.52 4.48 10 10 10z" fill="#fff"/>
-                </svg>
-            </span>
+            <span class="sun"><svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="#FCDE5B"/><g stroke="#FCDE5B" stroke-width="2"><line x1="16" y1="2" x2="16" y2="8"/><line x1="16" y1="24" x2="16" y2="30"/><line x1="2" y1="16" x2="8" y2="16"/><line x1="24" y1="16" x2="30" y2="16"/><line x1="6.34" y1="6.34" x2="10.49" y2="10.49"/><line x1="21.51" y1="21.51" x2="25.66" y2="25.66"/><line x1="6.34" y1="25.66" x2="10.49" y2="21.51"/><line x1="21.51" y1="10.49" x2="25.66" y2="6.34"/></g></svg></span>
+            <span class="moon"><svg width="32" height="32" viewBox="0 0 32 32"><path d="M22 16a10 10 0 1 1-10-10c0 5.52 4.48 10 10 10z" fill="#fff"/></svg></span>
         </div>
     </div>
     <!-- === MENÚ SUPERIOR DEL USUARIO === -->
@@ -45,8 +33,8 @@
 
     <main>
         <!-- Mensaje de retroalimentación -->
-        <?php if (!empty($_GET['msg'])): ?>
-            <p class="info"><strong><?= htmlspecialchars($_GET['msg']) ?></strong></p>
+        <?php if (!empty($_GET['msg'])): ?> <!-- Mostrar mensaje si existe -->
+            <p class="info"><strong><?= htmlspecialchars($_GET['msg']) ?></strong></p> 
         <?php endif; ?>
 
         <!-- === SECCIÓN PRINCIPAL DE ESTADÍSTICAS === -->
@@ -56,8 +44,8 @@
             <!-- === TABLA DE ESTADÍSTICAS POR LETRA === -->
             <h2 class="subtitulo">Estadísticas por letra</h2>
 
-            <div class="tabla-responsive">
-                <table class="estadisticas-table" aria-label="Estadísticas por letra">
+            <div class="tabla-responsive"> <!-- Contenedor para tabla responsiva -->
+                <table class="estadisticas-table" aria-label="Estadísticas por letra"> <!-- Tabla de estadísticas -->
                     <thead>
                         <tr>
                             <th>Letra</th>
@@ -85,7 +73,7 @@
                             $dom = $estadisticas[$l]['porcDominancia'];
                             $claseBarra = ($dom==$maxDom) ? 'dominante' : (($dom==$minDom) ? 'bajo' : 'intermedio');
                         ?>
-                        <tr>
+                        <tr> <!-- Fila por letra -->
                             <td class="col-letra"><?= $l ?></td>
                             <td class="col-preguntas"><?= $numPreguntas[$l] ?></td>
                             <td class="col-max"><?= $puntajeMax[$l] ?></td>
