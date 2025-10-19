@@ -4,7 +4,10 @@
     Incluye opciones para gestionar carreras, preguntas, usuarios y ver estadísticas.
 -->
 
-<?php require_once __DIR__ . '/../../PHP/Funciones/OpcionesF.php'; ?>
+<?php require_once __DIR__ . '/../../PHP/Funciones/OpcionesF.php';
+// Proteger esta vista: exigir que el usuario exista y sea admin
+validar_sesion_usuario(true);
+?>
 
 <!-- PARTE HTML -->
 

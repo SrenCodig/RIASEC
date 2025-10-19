@@ -64,7 +64,9 @@ function validar_sesion_usuario(bool $enforce_admin = false): void {
     }
 }
 
-// Por defecto, Opciones es una página admin: validar existencia y rol
-validar_sesion_usuario(true);
+// Nota: no se ejecuta la validación automáticamente aquí; las vistas/funciones que
+// requieran comprobar sesión o rol deben llamar a validar_sesion_usuario(true) o false
+// según corresponda. Esto evita que páginas públicas (index/resultados) queden
+// forzadas a exigir admin al incluir este archivo.
 
 ?>
