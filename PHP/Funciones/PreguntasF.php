@@ -3,15 +3,9 @@
 // Lógica para VIEWS/ADMIN/Preguntas.php (listado, añadir, editar, eliminar)
 
 require_once __DIR__ . '/../crud.php';
-
-// Asegurar sesión
-if (session_status() === PHP_SESSION_NONE) session_start();
-
-// Seguridad: solo administradores (rol 1)
-if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
-    header('Location: /RIASEC/index.php');
-    exit;
-}
+require_once __DIR__ . '/OpcionesF.php';
+// Validación centralizada: exigir admin
+validar_sesion_usuario(true);
 
 // Mensaje de estado y definiciones de categorías
 $msg = '';

@@ -3,11 +3,9 @@
 // Contiene la lógica para preparar datos y procesar el formulario de la prueba RIASEC.
 
 require_once __DIR__ . '/../crud.php';
-
-// Iniciar la sesión si aún no existe. session_status() devuelve el estado actual de la sesión.
-if (session_status() === PHP_SESSION_NONE) {
-	session_start(); // Abre o reanuda la sesión para acceder a $_SESSION
-}
+require_once __DIR__ . '/OpcionesF.php';
+// Asegurar sesión y cerrar si el usuario en sesión ya no existe. No exigimos admin aquí.
+validar_sesion_usuario(false);
 
 // Inicializar contenedores para preguntas y opciones.
 $preguntas = [];

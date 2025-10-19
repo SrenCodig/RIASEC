@@ -3,15 +3,9 @@
 // Lógica para VIEWS/ADMIN/Carreras.php
 
 require_once __DIR__ . '/../crud.php';
-
-// Iniciar sesión si es necesario
-if (session_status() === PHP_SESSION_NONE) session_start();
-
-// Seguridad: solo administradores
-if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
-    header('Location: /RIASEC/index.php');
-    exit;
-}
+require_once __DIR__ . '/OpcionesF.php';
+// Validación centralizada: exigir admin
+validar_sesion_usuario(true);
 
 $msg = '';
 

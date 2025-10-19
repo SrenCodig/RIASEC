@@ -3,9 +3,9 @@
 // Lógica para preparar datos usados por VIEWS/USER/Resultados.php
 
 require_once __DIR__ . '/../crud.php';
-
-// Asegurar que la sesión está iniciada para leer id de usuario y demás
-if (session_status() === PHP_SESSION_NONE) session_start();
+require_once __DIR__ . '/OpcionesF.php';
+// Validación centralizada: no exigimos admin, pero cerrará sesión si el usuario ya no existe
+validar_sesion_usuario(false);
 
 // Variables iniciales que la vista esperará
 $usuarioRegistrado = isset($_SESSION['id_usuario']); // true si hay usuario en sesión

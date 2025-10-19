@@ -3,18 +3,12 @@
 // Lógica para VIEWS/ADMIN/Estadisticas.php
 
 require_once __DIR__ . '/../crud.php';
-
-// Iniciar sesión si es necesario
-if (session_status() === PHP_SESSION_NONE) session_start();
+require_once __DIR__ . '/OpcionesF.php';
+// Validación centralizada: exigir admin
+validar_sesion_usuario(true);
 
 // Definir las letras usadas en el perfil RIASEC
 $letras = ['R','I','A','S','E','C'];
-
-// Control de acceso: solo administradores pueden ver estadísticas
-if (!isset($_SESSION['id_usuario'], $_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
-    echo "<p style='color:red'><strong>Acceso denegado. Solo administradores.</strong></p>";
-    exit;
-}
 
 // Helper que calcula cuántas preguntas hay por letra y el puntaje máximo posible
 function obtenerDatosPreguntasOpciones($letras) {

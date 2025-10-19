@@ -94,21 +94,20 @@ CREATE TABLE resultados (
 -- como porcentajes por cada letra RIASEC. Estos porcentajes
 -- sirven para calcular afinidades con el perfil del usuario.
 -- ==========================================================
-CREATE TABLE `carreras` (
-    -- PK autoincremental de la carrera
-    `id_carrera` INT(11) NOT NULL AUTO_INCREMENT,
-    -- Nombre de la carrera (collation para soportar UTF-8 y comparaciones)
-    `nombre` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_uca1400_ai_ci',
-    -- Porcentajes ideales por letra (pueden ser NULL si no definidos)
-    `porcentaje_R` TINYINT(4) NULL DEFAULT NULL,
-    `porcentaje_I` TINYINT(4) NULL DEFAULT NULL,
-    `porcentaje_A` TINYINT(4) NULL DEFAULT NULL,
-    `porcentaje_S` TINYINT(4) NULL DEFAULT NULL,
-    `porcentaje_E` TINYINT(4) NULL DEFAULT NULL,
-    `porcentaje_C` TINYINT(4) NULL DEFAULT NULL,
-    -- Descripción larga de la carrera
-    `descripcion` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_uca1400_ai_ci',
-    PRIMARY KEY (`id_carrera`) USING BTREE
+CREATE TABLE carreras (
+    -- Identificador de la carrera (PK autoincremental)
+    id_carrera INT PRIMARY KEY AUTO_INCREMENT,
+    -- Nombre de la carrera
+    nombre VARCHAR(100) NOT NULL,
+    -- Porcentajes ideales por letra R/I/A/S/E/C (0-100) -- pueden ser NULL si no definidos
+    porcentaje_R TINYINT NULL DEFAULT NULL,
+    porcentaje_I TINYINT NULL DEFAULT NULL,
+    porcentaje_A TINYINT NULL DEFAULT NULL,
+    porcentaje_S TINYINT NULL DEFAULT NULL,
+    porcentaje_E TINYINT NULL DEFAULT NULL,
+    porcentaje_C TINYINT NULL DEFAULT NULL,
+    -- Descripción de la carrera
+    descripcion TEXT NULL
 );
 
 -- ==========================================================

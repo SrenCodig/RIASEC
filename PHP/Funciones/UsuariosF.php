@@ -2,15 +2,9 @@
 // Archivo: PHP/Funciones/UsuariosF.php
 // Lógica para la vista de administración `VIEWS/ADMIN/Usuarios.php`
 
-require_once __DIR__ . '/../crud.php';
-
-// Iniciar sesión si no está
-if (session_status() === PHP_SESSION_NONE) session_start();
-
-// Seguridad: sólo permitir acceso a administradores (rol 1)
-if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
-    die('<h2>Acceso denegado. Solo administradores.</h2>');
-}
+require_once __DIR__ . '/OpcionesF.php';
+// Validación centralizada: exigir admin
+validar_sesion_usuario(true);
 
 // Mensaje informativo mostrado en la vista y flags de edición
 $msg = '';
