@@ -167,5 +167,6 @@ Notas finales
 -------------
 - `Data.sql` es un archivo de semillas opcional diseñado para enriquecer la base de datos con 60 preguntas de la prueba RIASEC y una lista de 100 carreras con porcentajes por cada letra. Importar este archivo facilita pruebas funcionales, demostraciones y comprobaciones de consistencia sin necesidad de ingresar datos manualmente. No es obligatorio.
 - Cada porcentaje de una `letra` de una `Carrera` son independientes de las otras, el total todas estas no tiene que ser un 100%
+- Entre mas preguntas hayan en el test, mas preciso sera la eleccion de carrera, Esto por que se manenjan los resultados como porcentajes segun el puntaje max que se puede obtener.
 
 20/10/2025 Ultima actualizacion.
