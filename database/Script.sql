@@ -1,4 +1,25 @@
 -- ==========================================================
+-- Script: Script.sql
+-- Crea la base de datos, las tablas y datos semilla para RIASEC
+-- Ejecutable desde cero: desactiva temporalmente foreign_key_checks
+-- ==========================================================
+
+-- Crear y seleccionar la base de datos
+CREATE DATABASE IF NOT EXISTS `test_vocacional` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `test_vocacional`;
+
+-- Desactivar comprobaciones de claves foráneas para permitir DROP/CREATE ordenado
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Borrar tablas si existen (permite re-ejecutar el script)
+DROP TABLE IF EXISTS resultados;
+DROP TABLE IF EXISTS carreras;
+DROP TABLE IF EXISTS usuarios;
+DROP TABLE IF EXISTS preguntas;
+DROP TABLE IF EXISTS opciones;
+DROP TABLE IF EXISTS roles;
+
+-- ==========================================================
 -- Tabla: roles
 -- Esta tabla contiene los roles del sistema (por ejemplo: Administrador, Usuario).
 -- Cada rol tiene un identificador único y un nombre que debe ser único.
@@ -124,3 +145,6 @@ INSERT INTO opciones (valor, descripcion) VALUES
     (3,'Neutral'),
     (4,'De acuerdo'),
     (5,'Totalmente de acuerdo');
+
+-- Reactivar comprobaciones de claves foráneas
+SET FOREIGN_KEY_CHECKS = 1;

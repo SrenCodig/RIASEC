@@ -335,6 +335,32 @@ document.addEventListener('DOMContentLoaded', function() {
         // Inicializar estado del carrusel
         updateCarrusel();
     }
+
+    // Asegurar que el botón "Finalizar" envíe el formulario aunque aparezca deshabilitado
+    // (caso en que la página calcula $todasRespondidas desde la sesión y aún no contiene
+    //  la respuesta seleccionada en el DOM). Si no hay opción marcada, mostrar alerta.
+    (function() {
+        const finalizarBtn = document.querySelector('form button[name="finalizar"]');
+        if (!finalizarBtn) return;
+        finalizarBtn.addEventListener('click', function(e) {
+            const form = finalizarBtn.closest('form');
+            if (!form) return;
+            // Si el botón está deshabilitado, intentar enviar si hay una opción marcada
+            if (finalizarBtn.disabled) {
+                const checked = form.querySelector('input[type="radio"]:checked');
+                if (checked) {
+                    // Forzar submit programático (no usamos preventDefault)
+                    // Hacemos submit directamente para incluir el valor seleccionado en la petición
+                    form.submit();
+                } else {
+                    // Prevenir envío y avisar
+                    e.preventDefault();
+                    alert('Debes seleccionar una opción antes de finalizar.');
+                }
+            }
+            // Si no está deshabilitado, dejamos que el formulario se envíe normalmente
+        });
+    })();
 });
 
 // --------------------------------------------------
